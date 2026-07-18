@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/product.dart';
 import '../../providers/cart_provider.dart';
+import 'package:intl/intl.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -55,7 +56,7 @@ class ProductDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '\$${product.price.toStringAsFixed(2)}',
+                    '${NumberFormat("#,###", "vi_VN").format(product.price)} ₫',
                     style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 20,

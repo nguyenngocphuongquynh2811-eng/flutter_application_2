@@ -1,5 +1,6 @@
 import '../models/product.dart';
 import '../models/category.dart';
+import '../models/promo_card.dart';
 
 class MockData {
   static const List<Category> categories = [
@@ -15,7 +16,7 @@ class MockData {
       id: 'p1',
       name: 'iPhone 15 Pro',
       description: 'Titanium. So strong. So light. So Pro. The most advanced iPhone ever made.',
-      price: 999.00,
+      price: 34000000,
       imagePaths: [
         'assets/images/iphone15_1.jpg',
         'assets/images/iphone15_2.jpg'
@@ -27,7 +28,7 @@ class MockData {
       id: 'p2',
       name: 'MacBook Pro 14"',
       description: 'Mind-blowing. Head-turning. Powered by the M3 chip.',
-      price: 1599.00,
+      price: 51000000,
       imagePaths: [
         'assets/images/macbook_pro.jpg',
       ],
@@ -38,7 +39,7 @@ class MockData {
       id: 'p3',
       name: 'Apple Watch Ultra 2',
       description: 'Next-level adventure. The most rugged and capable Apple Watch pushes the limits again.',
-      price: 799.00,
+      price: 17000000,
       imagePaths: [
         'assets/images/watch_ultra.jpg',
       ],
@@ -49,7 +50,7 @@ class MockData {
       id: 'p4',
       name: 'iPad Pro',
       description: 'The ultimate iPad experience with the most advanced display, M2 chip, and Apple Pencil hover.',
-      price: 1099.00,
+      price: 25000000,
       imagePaths: [
         'assets/images/ipad_pro.jpg',
       ],
@@ -60,7 +61,7 @@ class MockData {
       id: 'p5',
       name: 'MacBook Air M3',
       description: 'Lean. Mean. M3 machine.',
-      price: 1099.00,
+      price: 21000000,
       imagePaths: [
         'assets/images/mac_cat.jpg',
       ],
@@ -71,18 +72,18 @@ class MockData {
       id: 'p6',
       name: 'iPhone 15',
       description: 'New camera. New design. Newphoria.',
-      price: 799.00,
+      price: 28000000,
       imagePaths: [
-        'assets/images/iphone_cat.jpg',
+        'assets/images/iphone15_3.jpg',
       ],
       categoryId: 'c2',
-      tag: '',
+      tag: 'Popular',
     ),
     Product(
       id: 'p7',
       name: 'Apple Watch Series 9',
       description: 'Smarter. Brighter. Mightier.',
-      price: 399.00,
+      price: 15000000,
       imagePaths: [
         'assets/images/watch_cat.jpg',
       ],
@@ -93,12 +94,60 @@ class MockData {
       id: 'p8',
       name: 'AirPods Pro 2',
       description: 'Magic remastered.',
-      price: 249.00,
+      price: 2500000,
       imagePaths: [
         'assets/images/airpods_cat.jpg',
       ],
       categoryId: 'c5',
       tag: 'Bestseller',
+    ),
+    Product(
+      id: 'p9',
+      name: 'AirPods Pro 3',
+      description: 'Magic remastered.',
+      price: 3500000,
+      imagePaths: [
+        'assets/images/airpodpro.jpg',
+      ],
+      categoryId: 'c5',
+      tag: 'Bestseller',
+    ),
+  ];
+
+   static const List<PromoCard> promoCards = [
+    PromoCard(
+      image: 'assets/images/ip15.jpg',
+      category: 'IPHONE',
+      title: 'iPhone 15 Pro',
+      subtitle: 'Titanium. So strong. So light.',
+    ),
+
+    PromoCard(
+      image: 'assets/images/macbook_pro.jpg',
+      category: 'MAC',
+      title: 'MacBook Pro M3',
+      subtitle: 'Hiệu năng đỉnh cao cho công việc.',
+    ),
+
+    PromoCard(
+      image: 'assets/images/ipad_pro.jpg',
+      category: 'IPAD',
+      title: 'iPad Pro',
+      subtitle: 'Mạnh mẽ với chip M4.',
+    ),
+
+    PromoCard(
+      image: 'assets/images/airpodpro.jpg',
+      category: 'AIRPODS',
+      title: 'AirPods Pro',
+      subtitle: 'Âm thanh sống động.',
+    ),
+
+    PromoCard(
+      image: 'assets/images/watch_ultra.jpg',
+      category: 'APPLE WATCH',
+      title: 'Watch Ultra 2',
+      subtitle: 'Sẵn sàng cho mọi cuộc phiêu lưu.',
     ),
   ];
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'providers/cart_provider.dart';
 import 'screens/root_screen.dart';
 
@@ -27,17 +25,23 @@ class AppleStoreApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         primaryColor: Colors.black,
         scaffoldBackgroundColor: Colors.black,
+
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
           elevation: 0,
           centerTitle: true,
         ),
+
         colorScheme: const ColorScheme.dark(
           primary: Colors.white,
           secondary: Colors.blueAccent,
           surface: Color(0xFF1C1C1E),
         ),
-        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+
+        textTheme: ThemeData.dark().textTheme.apply(
+          fontFamily: '.SF Pro Display',
+        ),
+
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Color(0xFF1C1C1E),
           selectedItemColor: Colors.blueAccent,
