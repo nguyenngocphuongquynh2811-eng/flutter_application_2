@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '/../widgets/profile_avatar.dart';
 import '../settings/settings_screen.dart';
 import '../../data/mock_data.dart';
+import '../settings/notification_screen.dart';
+import '../profile/account_bottom_sheet.dart';
 
 class ForYouScreen extends StatelessWidget {
   const ForYouScreen({super.key});
@@ -24,20 +26,30 @@ class ForYouScreen extends StatelessWidget {
                 bottom: 16,
               ),
             title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Dành cho bạn',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                    color: Colors.white,
-                  ),
-                ),
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    const Text(
+      'Dành cho bạn',
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 22,
+        color: Colors.white,
+      ),
+    ),
 
-                const ProfileAvatar(),
-              ],
-            ),
+    GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          backgroundColor: Colors.transparent,
+          isScrollControlled: true,
+          builder: (_) => const AccountBottomSheet(),
+        );
+      },
+      child: const ProfileAvatar(),
+    ),
+  ],
+),
             background: Container(
               color: Colors.black,
             ),
@@ -123,86 +135,113 @@ class ForYouScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  _buildInfoCard(
-                    icon: Icons.notifications_none,
-                    iconColor: Colors.redAccent,
-                    title: 'Đón đầu mọi thông tin.',
-                    subtitle:
-                    'Bật thông báo để nhận đề xuất cá nhân hoá, chương trình khuyến mãi và giới thiệu sản phẩm mới.',
-                  ),
+                  GestureDetector(
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const NotificationScreen(),
+      ),
+    );
+  },
+  child: _buildInfoCard(
+    icon: Icons.notifications_none,
+    iconColor: Colors.redAccent,
+    title: 'Đón đầu mọi thông tin.',
+    subtitle:
+      'Bật thông báo để nhận đề xuất cá nhân hoá, chương trình khuyến mãi và giới thiệu sản phẩm mới.',
+  ),
+),
                   const SizedBox(height: 40),
                   const Text(
                     'Đừng bỏ lỡ những điều tuyệt vời nhất của Apple',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    height: 500,
-                    child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: MockData.promoCards.length,
-                    itemBuilder: (context, index) {
-                      final item = MockData.promoCards[index];
 
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Container(
-                          width: 320,
+                  SizedBox(
+                    height: 400,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: MockData.promoCards.length,
+                      itemBuilder: (context, index) {
+                        final item = MockData.promoCards[index];
+
+                        return Container(
+                          width: 260,
+                          margin: const EdgeInsets.only(right: 16),
                           decoration: BoxDecoration(
+                            color: const Color(0xFF1C1C1E),
                             borderRadius: BorderRadius.circular(30),
-                            image: DecorationImage(
-                              image: AssetImage(item.image),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.2),
-                                Colors.black.withOpacity(0.75),
-                              ],
-                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                item.category,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+
+                              // Ảnh
+                              Container(
+                                height: 220,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(30),
+                                  ),
+                                  image: DecorationImage(
+                                    image: AssetImage(item.image),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
 
-                                  const SizedBox(height: 8),
+                              // Nội dung
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(18),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      if (item.category.isNotEmpty) ...[
+                                        Text(
+                                          item.category,
+                                          style: const TextStyle(
+                                            color: Colors.orange,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                      ],
 
-                                  Text(
-                                    item.title,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                      Text(
+                                        item.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 8),
+
+                                      Text(
+                                        item.subtitle,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 13,
+                                          height: 1.4,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 12),
+                                    ],
                                   ),
-
-                                  const Spacer(),
-
-                                  Text(
-                                    item.subtitle,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         );
                       },

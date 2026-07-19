@@ -116,38 +116,38 @@ class MockData {
 
    static const List<PromoCard> promoCards = [
     PromoCard(
-      image: 'assets/images/ip15.jpg',
-      category: 'IPHONE',
-      title: 'iPhone 15 Pro',
-      subtitle: 'Titanium. So strong. So light.',
+      image: 'assets/images/apple_music.jpg',
+      category: '',
+      title: 'Tặng 3 tháng sử dụng Apple Music miễn phí.',
+      subtitle: 'Đi kèm khi mua một số thiết bị Apple.',
     ),
 
     PromoCard(
-      image: 'assets/images/macbook_pro.jpg',
-      category: 'MAC',
-      title: 'MacBook Pro M3',
-      subtitle: 'Hiệu năng đỉnh cao cho công việc.',
+      image: 'assets/images/apple_fitness.jpg',
+      category: '',
+      title: 'Apple Fitness+',
+      subtitle: 'Từ Thể Lực đến Thiền Định, ai cũng tìm được bài tập cho mình.',
     ),
 
     PromoCard(
-      image: 'assets/images/ipad_pro.jpg',
-      category: 'IPAD',
-      title: 'iPad Pro',
-      subtitle: 'Mạnh mẽ với chip M4.',
+      image: 'assets/images/icloud.jpg',
+      category: '',
+      title: 'Thêm nhiều lợi ích cùng iCloud+.',
+      subtitle: 'Nhận dung lượng lưu trữ bạn cần, cùng quyền riêng tư bạn đáng có. Nâng cấp gói iCloud+ ngay.',
     ),
 
     PromoCard(
-      image: 'assets/images/airpodpro.jpg',
-      category: 'AIRPODS',
-      title: 'AirPods Pro',
-      subtitle: 'Âm thanh sống động.',
+      image: 'assets/images/apple_pay.jpg',
+      category: '',
+      title: 'Khám phá tất cả các cách sử dụng Apple Pay.',
+      subtitle: 'Tìm hiểu thêm tại apple.com',
     ),
 
     PromoCard(
-      image: 'assets/images/watch_ultra.jpg',
-      category: 'APPLE WATCH',
-      title: 'Watch Ultra 2',
-      subtitle: 'Sẵn sàng cho mọi cuộc phiêu lưu.',
+      image: 'assets/images/apple_arcade.jpg',
+      category: 'Apple Arcade',
+      title: 'Nhận 3 tháng miễn phí khi mua thiết bị Apple.',
+      subtitle: 'Chơi hàng trăm game mà không bị gián đoạn bởi quảng cáo.',
     ),
   ];
 }
