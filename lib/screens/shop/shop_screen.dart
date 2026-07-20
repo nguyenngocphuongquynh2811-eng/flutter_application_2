@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import '../profile/account_bottom_sheet.dart';
+import '/../widgets/profile_avatar.dart';
+import '../../data/mock_data.dart';
+
+
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
@@ -7,30 +12,42 @@ class ShopScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(22, 20, 22, 10),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
+      body: CustomScrollView(
+        slivers: [
+            SliverAppBar(
+              expandedHeight: 120,
+              floating: false,
+              pinned: true,
+              backgroundColor: Colors.black,
+              flexibleSpace: FlexibleSpaceBar(
+                titlePadding: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  bottom: 16,
+                ),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
                         "Sản Phẩm",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 34,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                    
+                      GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          builder: (_) => const AccountBottomSheet(),
+                        );
+                      },
+                      child: const ProfileAvatar(),
                     ),
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundImage: AssetImage(
-                        "assets/images/avatar.jpg",
-                      ),
-                    )
                   ],
                 ),
               ),
@@ -47,7 +64,7 @@ class ShopScreen extends StatelessWidget {
                   "Phụ kiện",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -61,19 +78,7 @@ class ShopScreen extends StatelessWidget {
             _sectionTitle("Khám phá sản phẩm mới"),
 
             SliverToBoxAdapter(
-              child: _horizontalCards(
-                [
-                  (
-                    "assets/images/macbook.jpg",
-                    "MacBook Neo",
-                    "Điều tuyệt diệu của Mac ở mức giá bất ngờ."
-                  ),
-                  (
-                    "assets/images/airpodsmax.jpg",
-                    "AirPods Max",
-                    "Âm thanh đỉnh cao."
-                  ),
-                ],
+              child: _newProductsSection(
               ),
             ),
 
@@ -178,7 +183,6 @@ class ShopScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -190,7 +194,7 @@ class ShopScreen extends StatelessWidget {
           title,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 30,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -208,32 +212,32 @@ class ShopScreen extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 170,
+      height: 120,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
         itemBuilder: (_, index) {
           return Container(
-            width: 150,
+            width: 110,
             margin: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
               color: const Color(0xFF1C1C1E),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
                   "assets/images/${items[index].$1}",
-                  height: 70,
+                  height: 50,
                 ),
                 const SizedBox(height: 15),
                 Text(
                   items[index].$2,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 14,
                   ),
                 )
               ],
@@ -252,7 +256,7 @@ class ShopScreen extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 60,
+      height: 40,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -272,7 +276,7 @@ class ShopScreen extends StatelessWidget {
                 accessories[index],
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 17,
+                  fontSize: 14,
                 ),
               ),
             ),
@@ -340,4 +344,262 @@ class ShopScreen extends StatelessWidget {
       ),
     );
   }
+  static Widget _newProductsSection() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 22),
+    child: Column(
+      children: [
+        // CARD LỚN
+        ...MockData.bigCards.map((product) {
+          final isDark = ThemeData.estimateBrightnessForColor(
+                product.backgroundColor,
+              ) ==
+              Brightness.dark;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Container(
+              height: 540,
+              decoration: BoxDecoration(
+                color: product.backgroundColor,
+                borderRadius: BorderRadius.circular(32),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Image.asset(
+                      product.image,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black87,
+                            Colors.black54,
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                        children: [
+                          if (product.tag != null)
+                            Text(
+                              product.tag!,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+
+                          const SizedBox(height: 6),
+
+                          Text(
+                            product.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          Text(
+                            product.subtitle,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 15,
+                            ),
+                          ),
+
+                          const SizedBox(height: 18),
+
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.price,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight:
+                                          FontWeight.w600,
+                                    ),
+                                  ),
+
+                                  if (product.priceNote != null)
+                                    Text(
+                                      product.priceNote!,
+                                      style:
+                                          const TextStyle(
+                                        color:
+                                            Colors.white60,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                ],
+                              ),
+
+                              ElevatedButton(
+                                onPressed: () {},
+                                style:
+                                    ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.white,
+                                  foregroundColor:
+                                      Colors.black,
+                                  shape:
+                                      RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius
+                                            .circular(30),
+                                  ),
+                                ),
+                                child: const Text("Mua"),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+
+        const SizedBox(height: 10),
+
+        // CARD NHỎ
+        SizedBox(
+          height: 320,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: MockData.smallCards.length,
+            itemBuilder: (context, index) {
+              final product = MockData.smallCards[index];
+
+              return Container(
+                width: 250,
+                margin: const EdgeInsets.only(right: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  children: [
+                  // ẢNH
+                    Expanded(
+                      flex: 7,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        alignment: Alignment.center,
+                        child: Image.asset(
+                          product.image,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    // THÔNG TIN
+                    Expanded(
+                      flex: 3,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(
+                          18,
+                          12,
+                          18,
+                          14,
+                        ),
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                              color: Color(0xFFEAEAEA),
+                            ),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 4),
+                            Text(
+                              product.price,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+
+                            const Spacer(),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                padding:
+                                const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                 color: Colors.black,
+                                  borderRadius:
+                                  BorderRadius.circular(20),
+                                ),
+                                child: const Text(
+                                  "Mua",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight:
+                                    FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),  
+                      ),  
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }
