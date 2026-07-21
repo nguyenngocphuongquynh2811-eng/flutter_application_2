@@ -25,36 +25,36 @@ class ForYouScreen extends StatelessWidget {
                 right: 20,
                 bottom: 16,
               ),
-            title: Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    const Text(
-      'Dành cho bạn',
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 22,
-        color: Colors.white,
-      ),
-    ),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Dành cho bạn',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                      color: Colors.white,
+                    ),
+                  ),
 
-    GestureDetector(
-      onTap: () {
-        showModalBottomSheet(
-          context: context,
-          backgroundColor: Colors.transparent,
-          isScrollControlled: true,
-          builder: (_) => const AccountBottomSheet(),
-        );
-      },
-      child: const ProfileAvatar(),
-    ),
-  ],
-),
-            background: Container(
-              color: Colors.black,
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                        builder: (_) => const AccountBottomSheet(),
+                      );
+                    },
+                    child: const ProfileAvatar(),
+                  ),
+                ],
+              ),
+              background: Container(
+                color: Colors.black,
+              ),
             ),
           ),
-        ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -89,7 +89,6 @@ class ForYouScreen extends StatelessWidget {
                             height: 30,
                           ),
                           const SizedBox(width: 16),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,9 +96,9 @@ class ForYouScreen extends StatelessWidget {
                                 Text(
                                   'Cá nhân hoá trải nghiệm của bạn với Apple Store',
                                   style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 SizedBox(height: 4),
@@ -132,26 +131,25 @@ class ForYouScreen extends StatelessWidget {
                     subtitle:
                      'Lưu Apple Store yêu thích của bạn để có trải nghiệm mua sắm tuyệt vời hơn.',
                   ),
-
                   const SizedBox(height: 16),
 
                   GestureDetector(
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const NotificationScreen(),
-      ),
-    );
-  },
-  child: _buildInfoCard(
-    icon: Icons.notifications_none,
-    iconColor: Colors.redAccent,
-    title: 'Đón đầu mọi thông tin.',
-    subtitle:
-      'Bật thông báo để nhận đề xuất cá nhân hoá, chương trình khuyến mãi và giới thiệu sản phẩm mới.',
-  ),
-),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationScreen(),
+                        ),
+                      );
+                    },
+                    child: _buildInfoCard(
+                      icon: Icons.notifications_none,
+                      iconColor: Colors.redAccent,
+                      title: 'Đón đầu mọi thông tin.',
+                      subtitle:
+                      'Bật thông báo để nhận đề xuất cá nhân hoá, chương trình khuyến mãi và giới thiệu sản phẩm mới.',
+                    ),
+                  ),
                   const SizedBox(height: 40),
                   const Text(
                     'Đừng bỏ lỡ những điều tuyệt vời nhất của Apple',
@@ -166,7 +164,6 @@ class ForYouScreen extends StatelessWidget {
                       itemCount: MockData.promoCards.length,
                       itemBuilder: (context, index) {
                         final item = MockData.promoCards[index];
-
                         return Container(
                           width: 260,
                           margin: const EdgeInsets.only(right: 16),
@@ -177,8 +174,7 @@ class ForYouScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-
-                              // Ảnh
+                                // Ảnh
                               Container(
                                 height: 220,
                                 width: double.infinity,
@@ -192,8 +188,7 @@ class ForYouScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-
-                              // Nội dung
+                            // Nội dung
                               Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.all(18),
@@ -207,8 +202,8 @@ class ForYouScreen extends StatelessWidget {
                                             color: Colors.orange,
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
+                                          ),  
+                                        ),  
                                         const SizedBox(height: 8),
                                       ],
 
@@ -224,9 +219,8 @@ class ForYouScreen extends StatelessWidget {
                                       ),
 
                                       const SizedBox(height: 8),
-
                                       Text(
-                                        item.subtitle,
+                                      item.subtitle,
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
@@ -245,9 +239,8 @@ class ForYouScreen extends StatelessWidget {
                           ),
                         );
                       },
-                    ),
-                  ),
-                
+                    ),  
+                  ),          
                 ],
               ),
             ),
