@@ -78,8 +78,7 @@ class ShopScreen extends StatelessWidget {
             _sectionTitle("Khám phá sản phẩm mới"),
 
             SliverToBoxAdapter(
-              child: _newProductsSection(
-              ),
+              child: _newProductsSection(context),
             ),
 
             _sectionTitle("Apple Store tạo nên mọi khác biệt"),
@@ -287,6 +286,7 @@ class ShopScreen extends StatelessWidget {
   }
 
   static Widget _horizontalCards(List<(String, String, String)> items) {
+    
     return SizedBox(
       height: 520,
       child: ListView.builder(
@@ -344,7 +344,8 @@ class ShopScreen extends StatelessWidget {
       ),
     );
   }
-  static Widget _newProductsSection() {
+  static Widget _newProductsSection(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 22),
     child: Column(
@@ -426,10 +427,10 @@ class ShopScreen extends StatelessWidget {
                             product.title,
                             style: TextStyle(
                               color: textColor,
-                fontSize: 28,
-    fontWeight: FontWeight.bold,
-  ),
-),
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
 
                           const SizedBox(height: 18),
 
@@ -496,112 +497,106 @@ class ShopScreen extends StatelessWidget {
         const SizedBox(height: 10),
 
         // CARD NHỎ
-        SizedBox(
-          height: 380,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: MockData.smallCards.length,
-            itemBuilder: (context, index) {
-              final product = MockData.smallCards[index];
+        
+SizedBox(
+  
+  height: screenWidth * 0.95,
+  child: ListView.builder(
+    scrollDirection: Axis.horizontal,
+    itemCount: MockData.smallCards.length,
+    itemBuilder: (context, index) {
+      final product = MockData.smallCards[index];
+      
 
-              return Container(
-                width: 280,
-                margin: const EdgeInsets.only(right: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
+      return Container(
+        width: screenWidth * 0.82,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            Expanded(
+              flex: 7,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                alignment: Alignment.center,
+                child: Image.asset(
+                  product.image,
+                  fit: BoxFit.contain,
                 ),
-                clipBehavior: Clip.antiAlias,
+              ),
+            ),
+
+            Expanded(
+              flex: 3,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: Color(0xFFE5E5E5),
+                    ),
+                  ),
+                ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  // ẢNH
-                    Expanded(
-                      flex: 7,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        alignment: Alignment.center,
-                        child: Image.asset(
-                          product.image,
-                          fit: BoxFit.contain,
-                        ),
+                    Text(
+                      product.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // THÔNG TIN
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(
-                          18,
-                          12,
-                          18,
-                          14,
-                        ),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                              color: Color(0xFFEAEAEA),
-                            ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      product.price,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(20),
                           ),
                         ),
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              product.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 4),
-                            Text(
-                              product.price,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
-                            ),
-
-                            const Spacer(),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                padding:
-                                const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                 color: Colors.black,
-                                  borderRadius:
-                                  BorderRadius.circular(20),
-                                ),
-                                child: const Text(
-                                  "Mua",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight:
-                                    FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),  
-                      ),  
+                        child: const Text("Mua"),
+                      ),
                     ),
                   ],
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ),
+      );
+    },
+  ),
+),
       ],
     ),
   );
