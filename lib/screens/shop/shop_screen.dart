@@ -493,7 +493,7 @@ class ShopScreen extends StatelessWidget {
 
         // CARD NHỎ
         SizedBox(
-          height: 320,
+          height: 380,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: MockData.smallCards.length,
@@ -501,7 +501,7 @@ class ShopScreen extends StatelessWidget {
               final product = MockData.smallCards[index];
 
               return Container(
-                width: 250,
+                width: 280,
                 margin: const EdgeInsets.only(right: 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
