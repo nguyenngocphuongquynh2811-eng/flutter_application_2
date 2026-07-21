@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
 
 /// Mô tả một mục trong sidebar.
@@ -211,7 +213,7 @@ class _Sidebar extends StatelessWidget {
                 color: AdminColors.sidebarText, size: 20),
             title: const Text('Đăng xuất',
                 style: TextStyle(color: AdminColors.sidebarText, fontSize: 14)),
-            onTap: () {}, // làm sau, ở module auth
+            onTap: () => context.read<AuthProvider>().logout(),
           ),
         ],
       ),

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
+import 'screens/auth/login_screen.dart';
 import 'screens/root_screen.dart';
+import 'src/admin/presentation/admin_shell.dart';
+import 'src/core/theme/admin_theme.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()..init()),
       ],
       child: const AppleStoreApp(),
     ),
@@ -49,7 +54,27 @@ class AppleStoreApp extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
         ),
       ),
-      home: const RootScreen(),
+      home: const _AuthGate(),
     );
+  }
+}
+
+class _AuthGate extends StatelessWidget {
+  const _AuthGate();
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    if (!auth.isInitialized) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
+    if (!auth.isLoggedIn) return const LoginScreen();
+    if (auth.isAdmin) {
+      return Theme(data: buildAdminTheme(), child: const AdminShell());
+    }
+    return const RootScreen();
   }
 }

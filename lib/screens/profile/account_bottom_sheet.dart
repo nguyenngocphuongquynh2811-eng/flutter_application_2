@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/auth_provider.dart';
 
 class AccountBottomSheet extends StatelessWidget {
   const AccountBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().currentUser;
+
     return DraggableScrollableSheet(
       initialChildSize: 0.92,
       minChildSize: 0.7,
@@ -33,7 +38,7 @@ class AccountBottomSheet extends StatelessWidget {
                         height: 58,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.white.withValues(alpha: 0.08),
                           border: Border.all(
                             color: Colors.white10,
                           ),
@@ -82,20 +87,20 @@ class AccountBottomSheet extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment:
                               CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              "Quỳnh Phương",
-                              style: TextStyle(
+                              user?.name ?? 'Khách',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                               ),
                             ),
 
-                            SizedBox(height: 6),
+                            const SizedBox(height: 6),
 
                             Text(
-                              "nguyenngocphuongquynh2811@gmail.com",
-                              style: TextStyle(
+                              user?.email ?? '',
+                              style: const TextStyle(
                                 color: Colors.blue,
                                 fontSize: 14,
                               ),
@@ -129,6 +134,79 @@ class AccountBottomSheet extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 _singleItem("Nhận Trợ Giúp"),
+
+                const SizedBox(height: 24),
+
+                GestureDetector(
+                  onTap: () async {
+                    await context.read<AuthProvider>().logout();
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 22,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2C2C2E),
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                    child: const Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Đăng Xuất",
+                            style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.logout,
+                          color: Colors.redAccent,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                GestureDetector(
+                  onTap: () => _confirmDeleteAccount(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 22,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: Colors.redAccent.withValues(alpha: 0.4)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Xóa Tài Khoản",
+                            style: TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.delete_forever_outlined,
+                          color: Colors.redAccent,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 40),
 
@@ -197,6 +275,35 @@ class AccountBottomSheet extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _confirmDeleteAccount(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF2C2C2E),
+        title: const Text('Xóa tài khoản?', style: TextStyle(color: Colors.white)),
+        content: const Text(
+          'Tài khoản và mật khẩu đã lưu sẽ bị xóa vĩnh viễn khỏi hệ thống. Bạn không thể hoàn tác hành động này.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Hủy', style: TextStyle(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Xóa', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    await context.read<AuthProvider>().deleteAccount();
+    if (context.mounted) Navigator.pop(context);
   }
 
   Widget _singleItem(String title) {

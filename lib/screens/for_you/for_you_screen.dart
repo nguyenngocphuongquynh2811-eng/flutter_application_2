@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/../widgets/profile_avatar.dart';
+import '../../widgets/profile_avatar.dart';
 import '../settings/settings_screen.dart';
 import '../../data/mock_data.dart';
 import '../settings/notification_screen.dart';
