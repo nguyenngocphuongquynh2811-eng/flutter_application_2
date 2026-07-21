@@ -2,8 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/cart_provider.dart';
 import 'screens/root_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  // 1. Bắt buộc phải có dòng này để Flutter chuẩn bị nền tảng
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 2. Khởi tạo Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // 3. Chạy app của bạn (giữ nguyên MultiProvider)
   runApp(
     MultiProvider(
       providers: [
