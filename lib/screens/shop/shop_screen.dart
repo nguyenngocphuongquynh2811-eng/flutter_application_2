@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../profile/account_bottom_sheet.dart';
 import '/../widgets/profile_avatar.dart';
 import '../../data/mock_data.dart';
+import 'apple_music_detail_screen.dart';
 
 
 
@@ -83,20 +84,25 @@ class ShopScreen extends StatelessWidget {
 
             _sectionTitle("Apple Store tạo nên mọi khác biệt"),
 
-            SliverToBoxAdapter(
-              child: _horizontalCards(
-                [
-                  (
-                    "assets/images/emoji.jpg",
-                    "Thêm dấu ấn của riêng bạn",
-                    "Khắc tên miễn phí."
-                  ),
-                  (
-                    "assets/images/tradein.jpg",
-                    "Trade In",
-                    "Đổi cũ lấy mới."
-                  ),
-                ],
+            Builder(
+              builder: (context) => SliverToBoxAdapter(
+                child: _horizontalCards(
+                  context,
+                  [
+                    (
+                      "assets/images/emoji.jpg",
+                      "Thêm dấu ấn của riêng bạn",
+                      "Khắc tên miễn phí.",
+                      null,
+                    ),
+                    (
+                      "assets/images/tradein.jpg",
+                      "Trade In",
+                      "Đổi cũ lấy mới.",
+                      null,
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -127,20 +133,32 @@ class ShopScreen extends StatelessWidget {
 
             _sectionTitle("Tận hưởng trải nghiệm đến từ Apple"),
 
-            SliverToBoxAdapter(
-              child: _horizontalCards(
-                [
-                  (
-                    "assets/images/music.jpg",
-                    "Apple Music",
-                    "Tặng 3 tháng miễn phí."
-                  ),
-                  (
-                    "assets/images/fitness.jpg",
-                    "Fitness+",
-                    "Tập luyện mọi lúc."
-                  ),
-                ],
+            Builder(
+              builder: (context) => SliverToBoxAdapter(
+                child: _horizontalCards(
+                  context,
+                  [
+                    (
+                      "assets/images/music.jpg",
+                      "Apple Music",
+                      "Tặng 3 tháng miễn phí.",
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AppleMusicDetailScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    (
+                      "assets/images/fitness.jpg",
+                      "Fitness+",
+                      "Tập luyện mọi lúc.",
+                      null,
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -286,7 +304,6 @@ class ShopScreen extends StatelessWidget {
   }
 
   static Widget _horizontalCards(List<(String, String, String)> items) {
-    
     return SizedBox(
       height: 520,
       child: ListView.builder(
@@ -296,7 +313,9 @@ class ShopScreen extends StatelessWidget {
         itemBuilder: (_, index) {
           final item = items[index];
 
-          return Container(
+          return GestureDetector(
+            onTap: item.$4,
+            child: Container(
             width: 320,
             margin: const EdgeInsets.only(right: 20),
             decoration: BoxDecoration(
@@ -339,6 +358,7 @@ class ShopScreen extends StatelessWidget {
                 )
               ],
             ),
+            ),
           );
         },
       ),
@@ -352,14 +372,6 @@ class ShopScreen extends StatelessWidget {
       children: [
         // CARD LỚN
         ...MockData.bigCards.map((product) {
-          final isDark = ThemeData.estimateBrightnessForColor(
-                product.backgroundColor,
-              ) ==
-              Brightness.dark;
-
-          final textColor =
-            isDark ? Colors.white : Colors.black;
-
           return Padding(
             padding: const EdgeInsets.only(bottom: 20),
             child: Container(
@@ -427,10 +439,10 @@ class ShopScreen extends StatelessWidget {
                             product.title,
                             style: TextStyle(
                               color: textColor,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                fontSize: 28,
+    fontWeight: FontWeight.bold,
+  ),
+),
 
                           const SizedBox(height: 18),
 
