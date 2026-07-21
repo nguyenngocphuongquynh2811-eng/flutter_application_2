@@ -356,6 +356,9 @@ class ShopScreen extends StatelessWidget {
               ) ==
               Brightness.dark;
 
+          final textColor =
+            isDark ? Colors.white : Colors.black;
+
           return Padding(
             padding: const EdgeInsets.only(bottom: 20),
             child: Container(
@@ -420,12 +423,13 @@ class ShopScreen extends StatelessWidget {
                           const SizedBox(height: 8),
 
                           Text(
-                            product.subtitle,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 15,
-                            ),
-                          ),
+                            product.title,
+                            style: TextStyle(
+                              color: textColor,
+                fontSize: 28,
+    fontWeight: FontWeight.bold,
+  ),
+),
 
                           const SizedBox(height: 18),
 
