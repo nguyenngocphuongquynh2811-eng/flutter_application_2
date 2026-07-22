@@ -92,27 +92,56 @@ class ShopScreen extends StatelessWidget {
               ),
             ),
 
-            _sectionTitle("Mua cho các thiết bị của bạn"),
+            _sectionTitle("Mua cho các thiết bị của bạn."),
 
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Container(
-                  height: 220,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF111111),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Bật Thiết Bị và Dịch Vụ",
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Dòng mô tả (Subtitle)
+                    const Text(
+                      "Xem các đề xuất, sản phẩm và phụ kiện tương thích với thiết bị bạn đang sở hữu.",
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
+                        color: Colors.white70, // Màu xám nhạt giống bản gốc
+                        fontSize: 16,
+                        height: 1.4,
                       ),
                     ),
-                  ),
+                    
+                    const SizedBox(height: 30),
+                    
+                    // Nút bấm căn giữa (Button)
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // TODO: Thêm action khi bấm nút
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 18,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          "Bật Thiết Bị và Dịch Vụ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 10), // Khoảng cách đệm phía dưới
+                  ],
                 ),
               ),
             ),
@@ -124,11 +153,13 @@ class ShopScreen extends StatelessWidget {
                 child: _horizontalCards(
                   context,
                   [
-                    (
-                      "assets/images/music.jpg",
-                      "Apple Music",
-                      "Tặng 3 tháng miễn phí.",
-                      () {
+                    CardItemData(
+                      image: "assets/images/apple_music.jpg",
+                      title: "Tặng 3 tháng sử dụng Apple Music miễn phí.",
+                      subtitle: "Đi kèm khi mua một số thiết bị Apple.⁺",
+                      bgColor: const Color(0xFFF5F5F7),
+                      textColor: Colors.black,
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -137,11 +168,13 @@ class ShopScreen extends StatelessWidget {
                         );
                       },
                     ),
-                    (
-                      "assets/images/fitness.jpg",
-                      "Fitness+",
-                      "Tập luyện mọi lúc.",
-                      () {
+                    CardItemData(
+                      image: "assets/images/fitness.jpg",
+                      title: "Apple Fitness+",
+                      subtitle: "Từ Thể Lực đến Thiền Định, ai cũng tìm được bài tập cho mình.",
+                      bgColor: Colors.white,
+                      textColor: Colors.black,
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -150,44 +183,35 @@ class ShopScreen extends StatelessWidget {
                         );
                       },
                     ),
+                    CardItemData(
+                      image: "assets/images/icloud.jpg",
+                      title: "Thêm nhiều lợi ích cùng iCloud+.",
+                      subtitle: "Nhận dung lượng lưu trữ bạn cần, cùng quyền riêng tư bạn đáng có. Nâng cấp gói iCloud+ ngay.¶",
+                      bgColor: const Color(0xFF2463EB),
+                      textColor: Colors.white,
+                      onTap: () {},
+                    ),
+                    CardItemData(
+                      image: "assets/images/apple_pay.jpg", 
+                      title: "Khám phá tất cả các cách sử dụng Apple Pay.",
+                      subtitle: "Tìm hiểu thêm tại apple.com",
+                      bgColor: Colors.white,
+                      textColor: Colors.black,
+                      onTap: () {},
+                    ),
+                    CardItemData(
+                      image: "assets/images/apple_arcade.jpg",
+                      overline: "Apple Arcade",
+                      title: "Nhận 3 tháng miễn phí khi mua thiết bị Apple.**",
+                      subtitle: "Chơi hàng trăm game mà không bị gián đoạn bởi quảng cáo.",
+                      bgColor: const Color(0xFF0F0F10),
+                      textColor: Colors.white,
+                      onTap: () {},
+                    ),
                   ],
                 ),
               ),
             ),
-
-            _sectionTitle("Bạn cần trợ giúp đưa ra quyết định?"),
-
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Container(
-                  padding: const EdgeInsets.all(25),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/images/specialist.png",
-                        height: 180,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Mua sắm cùng Chuyên Gia theo cách thuận tiện với bạn.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
             const SliverPadding(
               padding: EdgeInsets.only(bottom: 120),
             ),
@@ -298,62 +322,89 @@ class ShopScreen extends StatelessWidget {
 
   static Widget _horizontalCards(
     BuildContext context,
-    List<(String, String, String, VoidCallback?)> items,
+    List<CardItemData> items, // <-- Đổi dòng này cho gọn nhẹ
   ) {
     return SizedBox(
-      height: 520,
+      height: 500,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 22),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
         itemBuilder: (_, index) {
           final item = items[index];
 
           return GestureDetector(
-            onTap: item.$4,
+            onTap: item.onTap,
             child: Container(
-            width: 320,
-            margin: const EdgeInsets.only(right: 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(35),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              children: [
-                Expanded(
-                  child: Image.asset(
-                    item.$1,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(22),
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.$2,
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
+              width: 300,
+              margin: const EdgeInsets.only(right: 20),
+              decoration: BoxDecoration(
+                color: item.bgColor,
+                borderRadius: BorderRadius.circular(28),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: Container(
+                      width: double.infinity,
+                      color: Colors.white,
+                      child: Image.asset(
+                        item.image,
+                        fit: BoxFit.cover,
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        item.$3,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                )
-              ],
-            ),
+                  Expanded(
+                    flex: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (item.overline != null) ...[
+                            Text(
+                              item.overline!,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: item.textColor.withOpacity(0.6),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                          ],
+                          Text(
+                            item.title,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: item.textColor,
+                              fontWeight: FontWeight.bold,
+                              height: 1.3,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            item.subtitle,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: item.textColor.withOpacity(0.6),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           );
         },
@@ -693,7 +744,7 @@ Widget _storeHighlights() {
   ];
 
   return SizedBox(
-    height: 300,
+    height: 230, // Đã giảm từ 300 xuống 190 để thu hẹp khoảng cách
     child: PageView.builder(
       itemCount: items.length,
       controller: PageController(
@@ -714,7 +765,7 @@ Widget _storeHighlights() {
                 height: 60,
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 15), // Tinh chỉnh lại một chút cho cân đối
 
               Text(
                 item.$2,
@@ -746,4 +797,23 @@ Widget _storeHighlights() {
     ),
   );
 }
+}
+class CardItemData {
+  final String image;
+  final String? overline;
+  final String title;
+  final String subtitle;
+  final Color bgColor;
+  final Color textColor;
+  final VoidCallback? onTap;
+
+  CardItemData({
+    required this.image,
+    this.overline,
+    required this.title,
+    required this.subtitle,
+    required this.bgColor,
+    required this.textColor,
+    this.onTap,
+  });
 }
