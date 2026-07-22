@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
+import '../../../../data/product_store.dart';
 import '../../../../models/product.dart';
-import 'edit_product_sheet.dart';
+import 'sheet/edit_product_sheet.dart';
 
 class AdminProductViewPage extends StatelessWidget {
   final Product product;
@@ -18,16 +20,18 @@ class AdminProductViewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 400,
             pinned: true,
             backgroundColor: Colors.black,
-            iconTheme: const IconThemeData(color: Colors.white),
+            iconTheme:
+                const IconThemeData(color: Colors.white),
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
-                tag: 'product-${product.id}',
+                tag: "product-${product.id}",
                 child: Image.asset(
                   product.imagePaths.first,
                   fit: BoxFit.cover,
@@ -35,11 +39,13 @@ class AdminProductViewPage extends StatelessWidget {
               ),
             ),
           ),
+
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   if (product.tag.isNotEmpty)
                     Text(
@@ -47,9 +53,11 @@ class AdminProductViewPage extends StatelessWidget {
                       style: const TextStyle(
                         color: Colors.orange,
                         fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                        fontWeight:
+                            FontWeight.bold,
                       ),
                     ),
+
                   const SizedBox(height: 8),
 
                   Text(
@@ -57,7 +65,8 @@ class AdminProductViewPage extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
-                      fontWeight: FontWeight.bold,
+                      fontWeight:
+                          FontWeight.bold,
                     ),
                   ),
 
@@ -88,16 +97,25 @@ class AdminProductViewPage extends StatelessWidget {
                     SizedBox(
                       height: 200,
                       child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: product.imagePaths.length,
-                        itemBuilder: (context, index) {
+                        scrollDirection:
+                            Axis.horizontal,
+                        itemCount:
+                            product.imagePaths.length,
+                        itemBuilder:
+                            (context, index) {
                           return Container(
                             width: 300,
-                            margin: const EdgeInsets.only(right: 16),
+                            margin:
+                                const EdgeInsets.only(
+                              right: 16,
+                            ),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius:
+                                  BorderRadius
+                                      .circular(16),
                               child: Image.asset(
-                                product.imagePaths[index],
+                                product.imagePaths[
+                                    index],
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -113,39 +131,128 @@ class AdminProductViewPage extends StatelessWidget {
           ),
         ],
       ),
+
       bottomSheet: Container(
         padding: const EdgeInsets.all(24),
         color: const Color(0xFF1C1C1E),
         child: SafeArea(
-          child: SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: 30,
                 ),
+                onPressed: () async {
+                  final ok =
+                      await showDialog<bool>(
+                    context: context,
+                    builder: (_) =>
+                        AlertDialog(
+                      backgroundColor:
+                          const Color(
+                              0xFF1C1C1E),
+                      title: const Text(
+                        "Xóa sản phẩm?",
+                        style: TextStyle(
+                          color:
+                              Colors.white,
+                        ),
+                      ),
+                      content: Text(
+                        'Xóa "${product.name}"?',
+                        style:
+                            const TextStyle(
+                          color: Colors
+                              .white70,
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.pop(
+                            context,
+                            false,
+                          ),
+                          child:
+                              const Text("Hủy"),
+                        ),
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.pop(
+                            context,
+                            true,
+                          ),
+                          child: const Text(
+                            "Xóa",
+                            style: TextStyle(
+                              color:
+                                  Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (ok == true &&
+                      context.mounted) {
+                    context
+                        .read<ProductStore>()
+                        .deleteProduct(
+                          product.id,
+                        );
+
+                    Navigator.pop(context);
+                  }
+                },
               ),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) => EditProductSheet(
-                    product: product,
-                    allProducts: allProducts,
+
+              const SizedBox(width: 12),
+
+              Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    style:
+                        ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.orange,
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius
+                                .circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled:
+                            true,
+                        builder: (_) =>
+                            EditProductSheet(
+                          product: product,
+                          allProducts:
+                              allProducts,
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Sửa",
+                      style: TextStyle(
+                        color:
+                            Colors.white,
+                        fontSize: 18,
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
                   ),
-                );
-              },
-              child: const Text(
-                "Sửa",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
