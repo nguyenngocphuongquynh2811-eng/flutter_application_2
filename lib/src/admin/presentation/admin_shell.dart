@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_application_2/src/product/product_page.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
@@ -33,7 +34,7 @@ class _AdminShellState extends State<AdminShell> {
       label: 'Sản phẩm',
       icon: Icons.inventory_2_outlined,
       activeIcon: Icons.inventory_2,
-      screen: _Placeholder('Quản lý sản phẩm'),
+      screen: ProductPage(),
     ),
     NavItem(
       label: 'Đơn hàng',
@@ -54,16 +55,16 @@ class _AdminShellState extends State<AdminShell> {
       screen: _Placeholder('Quản lý tài khoản'),
     ),
     NavItem(
+      label: 'Thống kê',
+      icon: Icons.bar_chart_outlined,
+      activeIcon: Icons.bar_chart,
+      screen: _Placeholder('Thống kê'),
+    ),
+    NavItem(
       label: 'Cài đặt',
       icon: Icons.settings_outlined,
       activeIcon: Icons.settings,
       screen: _Placeholder('Cài đặt'),
-    ),
-    NavItem(
-      label: 'Profile',
-      icon: Icons.person_outline,
-      activeIcon: Icons.person,
-      screen: _Placeholder('Profile'),
     ),
   ];
 
@@ -85,7 +86,7 @@ class _AdminShellState extends State<AdminShell> {
   }
 }
 
-/// Thanh điều hướng dưới đáy, cuộn ngang được khi nhiều mục.
+/// Thanh điều hướng nổi, bo tròn, cuộn ngang — đồng bộ với RootScreen bên khách hàng.
 class _ScrollableBottomBar extends StatelessWidget {
   const _ScrollableBottomBar({
     required this.items,
@@ -97,68 +98,95 @@ class _ScrollableBottomBar extends StatelessWidget {
   final int index;
   final ValueChanged<int> onSelect;
 
+  static const _pillRadius = 36.0;
+  static const _pillHeight = 72.0;
+
+  BoxDecoration get _pillDecoration => BoxDecoration(
+        color: const Color(0xFF2C2C2E),
+        borderRadius: BorderRadius.circular(_pillRadius),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      );
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AdminColors.surface,
-        border: Border(top: BorderSide(color: AdminColors.border)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 68,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 6),
-            itemBuilder: (context, i) {
-              final item = items[i];
-              final selected = i == index;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: _pillHeight,
+                decoration: _pillDecoration,
+                // Cắt theo bo góc để nội dung cuộn không tràn ra ngoài viên thuốc.
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(_pillRadius),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    itemCount: items.length,
+                    itemBuilder: (context, i) {
+                      final item = items[i];
+                      final selected = i == index;
+                      final color = selected ? Colors.blue : Colors.white70;
 
-              return Material(
-                color: selected
-                    ? AdminColors.accent.withValues(alpha: 0.18)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(14),
-                  onTap: () => onSelect(i),
-                  child: Container(
-                    width: 78,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          selected ? item.activeIcon : item.icon,
-                          size: 22,
-                          color: selected
-                              ? AdminColors.accent
-                              : AdminColors.textDim,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          item.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: selected
-                                ? AdminColors.accent
-                                : AdminColors.textDim,
-                            fontWeight:
-                                selected ? FontWeight.w600 : FontWeight.w400,
+                      return GestureDetector(
+                        onTap: () => onSelect(i),
+                        behavior: HitTestBehavior.opaque,
+                        child: SizedBox(
+                          width: 76,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                selected ? item.activeIcon : item.icon,
+                                color: color,
+                                size: 24,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                item.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: color,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // Nút tròn tách riêng — giống nút tìm kiếm bên app khách hàng.
+            Container(
+              width: _pillHeight,
+              height: _pillHeight,
+              decoration: _pillDecoration,
+              child: IconButton(
+                onPressed: () => context.read<AuthProvider>().logout(),
+                icon: const Icon(
+                  Icons.logout_rounded,
+                  size: 26,
+                  color: Colors.white70,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -172,77 +200,51 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AdminColors.background,
-        border: Border(bottom: BorderSide(color: AdminColors.border)),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Apple Store',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AdminColors.textDim,
-                        letterSpacing: 0.4,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_none,
-                    color: AdminColors.textDim),
-              ),
-              const SizedBox(width: 4),
-              PopupMenuButton<String>(
-                offset: const Offset(0, 44),
-                onSelected: (value) {
-                  if (value == 'logout') context.read<AuthProvider>().logout();
-                },
-                itemBuilder: (context) => const [
-                  PopupMenuItem(
-                    value: 'logout',
-                    child: Row(
-                      children: [
-                        Icon(Icons.logout, size: 18, color: Colors.redAccent),
-                        SizedBox(width: 10),
-                        Text('Đăng xuất'),
-                      ],
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 16, 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Apple Store',
+                    style: TextStyle(fontSize: 12, color: Colors.white54),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
                     ),
                   ),
                 ],
-                child: const CircleAvatar(
-                  radius: 17,
-                  backgroundColor: AdminColors.accent,
-                  child: Text('AD',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600)),
+              ),
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.notifications_none, color: Colors.white70),
+            ),
+            const SizedBox(width: 4),
+            const CircleAvatar(
+              radius: 18,
+              backgroundColor: Color(0xFF2C2C2E),
+              child: Text(
+                'TH',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
