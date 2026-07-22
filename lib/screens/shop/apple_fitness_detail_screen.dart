@@ -32,8 +32,10 @@ class AppleFitnessDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
@@ -76,7 +78,6 @@ class AppleFitnessDetailScreen extends StatelessWidget {
 
             _darkImageBanner(
               text: 'Các buổi tập mới mỗi tuần. Từ 5 đến 45 phút.',
-              onTap: () => _showTrialSnackBar(context),
             ),
 
             _plansSection(context),
@@ -150,36 +151,50 @@ class AppleFitnessDetailScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 110),
-          ],
-        ),
-      ),
-      bottomSheet: Container(
-        padding: const EdgeInsets.fromLTRB(22, 16, 22, 16),
-        color: Colors.black,
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+              ],
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+              top: false,
+              minimum: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+              child: Container(
+                height: 56,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-              ),
-              onPressed: () => _showTrialSnackBar(context),
-              child: const Text(
-                'Dùng thử miễn phí*',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                  ),
+                  onPressed: () => _showTrialSnackBar(context),
+                  child: const Text(
+                    'Dùng thử miễn phí*',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -227,28 +242,6 @@ class AppleFitnessDetailScreen extends StatelessWidget {
               fontSize: 30,
               fontWeight: FontWeight.bold,
               height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
-              ),
-              onPressed: () => _showTrialSnackBar(context),
-              child: const Text(
-                'Dùng thử miễn phí*',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
             ),
           ),
         ],
@@ -346,13 +339,10 @@ class AppleFitnessDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _darkImageBanner({
-    required String text,
-    required VoidCallback onTap,
-  }) {
+  Widget _darkImageBanner({required String text}) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 60, 22, 30),
+      padding: const EdgeInsets.fromLTRB(22, 60, 22, 60),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -360,41 +350,15 @@ class AppleFitnessDetailScreen extends StatelessWidget {
           colors: [Color(0xFF241608), Color(0xFF0C0803)],
         ),
       ),
-      child: Column(
-        children: [
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              height: 1.3,
-            ),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
-              ),
-              onPressed: onTap,
-              child: const Text(
-                'Dùng thử miễn phí*',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          height: 1.3,
+        ),
       ),
     );
   }
@@ -430,28 +394,6 @@ class AppleFitnessDetailScreen extends StatelessWidget {
             subtitle: 'Thể Lực và Yoga',
             meta: '3 NGÀY • 30 PHÚT / NGÀY',
             colors: const [Color(0xFFC23FC0), Color(0xFFE0A63F)],
-          ),
-          const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
-              ),
-              onPressed: () => _showTrialSnackBar(context),
-              child: const Text(
-                'Dùng thử miễn phí*',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ),
         ],
       ),
