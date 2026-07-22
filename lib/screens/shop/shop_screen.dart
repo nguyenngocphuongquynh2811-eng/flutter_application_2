@@ -303,7 +303,10 @@ class ShopScreen extends StatelessWidget {
     );
   }
 
-  static Widget _horizontalCards(List<(String, String, String)> items) {
+  static Widget _horizontalCards(
+    BuildContext context,
+    List<(String, String, String, VoidCallback?)> items,
+  ) {
     return SizedBox(
       height: 520,
       child: ListView.builder(
@@ -365,7 +368,6 @@ class ShopScreen extends StatelessWidget {
     );
   }
   static Widget _newProductsSection(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 22),
     child: Column(
@@ -436,13 +438,13 @@ class ShopScreen extends StatelessWidget {
                           const SizedBox(height: 8),
 
                           Text(
-                            product.title,
-                            style: TextStyle(
-                              color: textColor,
-                fontSize: 28,
-    fontWeight: FontWeight.bold,
-  ),
-),
+                            product.subtitle,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
 
                           const SizedBox(height: 18),
 
@@ -511,31 +513,25 @@ class ShopScreen extends StatelessWidget {
         // CARD NHỎ
         
 SizedBox(
-  
-  height: screenWidth * 0.95,
+  height: 360,
   child: ListView.builder(
     scrollDirection: Axis.horizontal,
     itemCount: MockData.smallCards.length,
     itemBuilder: (context, index) {
       final product = MockData.smallCards[index];
-      
 
       return Container(
-        width: screenWidth * 0.82,
+        width: 280,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(30),
         ),
         clipBehavior: Clip.antiAlias,
-        child: Column(
+        child: Stack(
           children: [
-            Expanded(
-              flex: 7,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                alignment: Alignment.center,
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
                 child: Image.asset(
                   product.image,
                   fit: BoxFit.contain,
@@ -543,60 +539,72 @@ SizedBox(
               ),
             ),
 
-            Expanded(
-              flex: 3,
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
               child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
+                padding: const EdgeInsets.all(18),
                 decoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: Color(0xFFE5E5E5),
-                    ),
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black87,
+                      Colors.black54,
+                      Colors.transparent,
+                    ],
                   ),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Text(
                       product.title,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 18,
+                        color: Colors.white,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
 
                     Text(
                       product.price,
                       style: const TextStyle(
+                        color: Colors.white70,
                         fontSize: 14,
-                        color: Colors.black54,
                       ),
                     ),
 
-                    const Spacer(),
+                    const SizedBox(height: 12),
 
                     Align(
                       alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(20),
+                      child: Container(
+                        padding:
+                            const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          "Mua",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight:
+                                FontWeight.w600,
                           ),
                         ),
-                        child: const Text("Mua"),
                       ),
                     ),
                   ],
@@ -608,7 +616,7 @@ SizedBox(
       );
     },
   ),
-),
+)
       ],
     ),
   );
