@@ -3,6 +3,7 @@ import '../profile/account_bottom_sheet.dart';
 import '/../widgets/profile_avatar.dart';
 import '../../data/mock_data.dart';
 import 'apple_music_detail_screen.dart';
+import 'apple_fitness_detail_screen.dart';
 
 
 
@@ -84,27 +85,9 @@ class ShopScreen extends StatelessWidget {
 
             _sectionTitle("Apple Store tạo nên mọi khác biệt"),
 
-            Builder(
-              builder: (context) => SliverToBoxAdapter(
-                child: _horizontalCards(
-                  context,
-                  [
-                    (
-                      "assets/images/emoji.jpg",
-                      "Thêm dấu ấn của riêng bạn",
-                      "Khắc tên miễn phí.",
-                      null,
-                    ),
-                    (
-                      "assets/images/tradein.jpg",
-                      "Trade In",
-                      "Đổi cũ lấy mới.",
-                      null,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            SliverToBoxAdapter(
+  child: _storeHighlights(),
+),
 
             _sectionTitle("Mua cho các thiết bị của bạn"),
 
@@ -155,7 +138,14 @@ class ShopScreen extends StatelessWidget {
                       "assets/images/fitness.jpg",
                       "Fitness+",
                       "Tập luyện mọi lúc.",
-                      null,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AppleFitnessDetailScreen(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -513,7 +503,7 @@ class ShopScreen extends StatelessWidget {
         // CARD NHỎ
         
 SizedBox(
-  height: 360,
+  height: 450,
   child: ListView.builder(
     scrollDirection: Axis.horizontal,
     itemCount: MockData.smallCards.length,
@@ -521,17 +511,22 @@ SizedBox(
       final product = MockData.smallCards[index];
 
       return Container(
-        width: 280,
-        margin: const EdgeInsets.only(right: 16),
+        width: 330,
+        margin: const EdgeInsets.only(right: 18),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(32),
+          border: Border.all(
+            color: const Color(0xFFE5E5EA),
+            width: 1,
+          ),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
+            // ẢNH
             Positioned.fill(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(18),
                 child: Image.asset(
                   product.image,
                   fit: BoxFit.contain,
@@ -539,17 +534,19 @@ SizedBox(
               ),
             ),
 
+            // NỘI DUNG
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
               child: Container(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
+                      Colors.black,
                       Colors.black87,
                       Colors.black54,
                       Colors.transparent,
@@ -561,52 +558,111 @@ SizedBox(
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
                   children: [
+                    // TAG
+                    if (product.tag != null)
+                      Text(
+                        product.tag!,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                    const SizedBox(height: 4),
+
+                    // TÊN
                     Text(
                       product.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
                     const SizedBox(height: 6),
 
+                    // SUBTITLE
                     Text(
-                      product.price,
+                      product.subtitle,
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
 
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          "Mua",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight:
-                                FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+                    Container(
+  padding: const EdgeInsets.symmetric(
+    horizontal: 14,
+    vertical: 12,
+  ),
+  decoration: BoxDecoration(
+    color: Colors.white.withOpacity(0.08),
+    borderRadius: BorderRadius.circular(20),
+    border: Border.all(
+      color: Colors.white.withOpacity(0.15),
+      width: 1,
+    ),
+  ),
+  child: Row(
+    crossAxisAlignment: CrossAxisAlignment.end,
+    children: [
+      Expanded(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              product.price,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 2),
+
+            if (product.priceNote != null)
+              Text(
+                product.priceNote!,
+                maxLines: 2,
+                softWrap: true,
+                style: const TextStyle(
+                  color: Colors.white60,
+                  fontSize: 11,
+                  height: 1.2,
+                ),
+              ),
+          ],
+        ),
+      ),
+
+      const SizedBox(width: 10),
+
+      ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(70, 40),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+        ),
+        child: const Text(
+          "Mua",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    ],
+  ),
+)
                   ],
                 ),
               ),
@@ -616,8 +672,89 @@ SizedBox(
       );
     },
   ),
-)
+),
       ],
+    ),
+  );
+}
+Widget _storeHighlights() {
+  final items = [
+    (
+      "assets/images/emoji.jpg",
+      "Thêm dấu ấn của riêng bạn.",
+      "Khắc kết hợp biểu tượng cảm xúc,\ntên và chữ số miễn phí."
+    ),
+    (
+      "assets/images/tradein.jpg",
+      "Trade In",
+      "Đổi cũ lấy mới cho thiết bị đang dùng của bạn."
+    ),
+  ];
+
+  return SizedBox(
+    height: 300,
+    child: PageView.builder(
+      itemCount: items.length,
+      controller: PageController(
+        viewportFraction: 1,
+      ),
+      itemBuilder: (context, index) {
+        final item = items[index];
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                item.$1,
+                width: 90,
+                height: 90,
+              ),
+
+              const SizedBox(height: 10),
+
+              Text(
+                item.$2,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Text(
+                item.$3,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 17,
+                  height: 1.4,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  "Tìm hiểu thêm >",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     ),
   );
 }
