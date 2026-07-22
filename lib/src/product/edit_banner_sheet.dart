@@ -160,7 +160,7 @@ class _EditBannerSheetState
 
                       return Card(
                         color: currentIndex == index
-                            ? Colors.orange.withOpacity(.2)
+                            ? Colors.orange.withValues(alpha: .2)
                             : const Color(0xFF1C1C1E),
                         child: ListTile(
                           leading: ClipRRect(

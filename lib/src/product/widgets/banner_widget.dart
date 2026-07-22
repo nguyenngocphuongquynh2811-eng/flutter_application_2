@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/banner_store.dart';
-import '../../../models/admin/banner_model.dart';
 import '../../product/edit_banner_sheet.dart';
 import 'banner_card.dart';
 

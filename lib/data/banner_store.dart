@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../models/admin/banner_model.dart';
-import 'mock_data.dart';
 
 
 class BannerStore extends ChangeNotifier {
@@ -9,13 +8,13 @@ class BannerStore extends ChangeNotifier {
   final List<BannerModel> _banners = [
 
     const BannerModel(
-      imagePath: "assets/images/iphone15_1.jpg",
-      title: "iPhone 15 Pro",
+      imagePath: "assets/images/iphone16.jpg",
+      title: "iPhone 16 Pro",
       subtitle: "Apple Intelligence",
     ),
 
     const BannerModel(
-      imagePath: "assets/images/macbook_pro.jpg",
+      imagePath: "assets/images/macbook.jpg",
       title: "MacBook Pro",
       subtitle: "Powerful Performance",
     ),

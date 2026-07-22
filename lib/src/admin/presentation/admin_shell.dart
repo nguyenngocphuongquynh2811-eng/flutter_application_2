@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_application_2/src/product/product_page.dart';
 
+import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
 
 class NavItem {
@@ -28,44 +30,43 @@ class _AdminShellState extends State<AdminShell> {
   int _index = 0;
 
   static const _items = <NavItem>[
-  NavItem(
-    label: 'Sản phẩm',
-    icon: Icons.inventory_2_outlined,
-    activeIcon: Icons.inventory_2,
-    screen: const ProductPage(),
-  ),
-  NavItem(
-    label: 'Đơn hàng',
-    icon: Icons.receipt_long_outlined,
-    activeIcon: Icons.receipt_long,
-    screen: _Placeholder('Quản lý đơn hàng'),
-  ),
-  NavItem(
-    label: 'Khuyến mãi',
-    icon: Icons.local_offer_outlined,
-    activeIcon: Icons.local_offer,
-    screen: _Placeholder('Quản lý khuyến mãi'),
-  ),
-  NavItem(
-    label: 'Tài khoản',
-    icon: Icons.people_outline,
-    activeIcon: Icons.people,
-    screen: _Placeholder('Quản lý tài khoản'),
-  ),
-  NavItem(
-    label: 'Thống kê',
-    icon: Icons.bar_chart_outlined,
-    activeIcon: Icons.bar_chart,
-    screen: _Placeholder('Thống kê'),
-  ),
-  NavItem(
-    label: 'Cài đặt',
-    icon: Icons.settings_outlined,
-    activeIcon: Icons.settings,
-    screen: _Placeholder('Cài đặt'),
-  ),
-];
-  
+    NavItem(
+      label: 'Sản phẩm',
+      icon: Icons.inventory_2_outlined,
+      activeIcon: Icons.inventory_2,
+      screen: ProductPage(),
+    ),
+    NavItem(
+      label: 'Đơn hàng',
+      icon: Icons.receipt_long_outlined,
+      activeIcon: Icons.receipt_long,
+      screen: _Placeholder('Quản lý đơn hàng'),
+    ),
+    NavItem(
+      label: 'Khuyến mãi',
+      icon: Icons.local_offer_outlined,
+      activeIcon: Icons.local_offer,
+      screen: _Placeholder('Quản lý khuyến mãi'),
+    ),
+    NavItem(
+      label: 'Tài khoản',
+      icon: Icons.people_outline,
+      activeIcon: Icons.people,
+      screen: _Placeholder('Quản lý tài khoản'),
+    ),
+    NavItem(
+      label: 'Thống kê',
+      icon: Icons.bar_chart_outlined,
+      activeIcon: Icons.bar_chart,
+      screen: _Placeholder('Thống kê'),
+    ),
+    NavItem(
+      label: 'Cài đặt',
+      icon: Icons.settings_outlined,
+      activeIcon: Icons.settings,
+      screen: _Placeholder('Cài đặt'),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +178,7 @@ class _ScrollableBottomBar extends StatelessWidget {
               height: _pillHeight,
               decoration: _pillDecoration,
               child: IconButton(
-                onPressed: () {},
+                onPressed: () => context.read<AuthProvider>().logout(),
                 icon: const Icon(
                   Icons.logout_rounded,
                   size: 26,
@@ -249,6 +250,7 @@ class _TopBar extends StatelessWidget {
     );
   }
 }
+
 class _Placeholder extends StatelessWidget {
   const _Placeholder(this.text);
 

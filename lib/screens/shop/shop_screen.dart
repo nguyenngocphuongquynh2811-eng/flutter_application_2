@@ -86,8 +86,11 @@ class ShopScreen extends StatelessWidget {
             _sectionTitle("Apple Store tạo nên mọi khác biệt"),
 
             SliverToBoxAdapter(
-  child: _storeHighlights(),
-),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: _storeHighlights(),
+              ),
+            ),
 
             _sectionTitle("Mua cho các thiết bị của bạn"),
 
@@ -600,10 +603,10 @@ SizedBox(
     vertical: 12,
   ),
   decoration: BoxDecoration(
-    color: Colors.white.withOpacity(0.08),
+    color: Colors.white.withValues(alpha: 0.08),
     borderRadius: BorderRadius.circular(20),
     border: Border.all(
-      color: Colors.white.withOpacity(0.15),
+      color: Colors.white.withValues(alpha: 0.15),
       width: 1,
     ),
   ),
@@ -681,13 +684,11 @@ Widget _storeHighlights() {
   final items = [
     (
       "assets/images/emoji.jpg",
-      "Thêm dấu ấn của riêng bạn.",
-      "Khắc kết hợp biểu tượng cảm xúc,\ntên và chữ số miễn phí."
+      "Thêm dấu ấn của riêng bạn. Khắc kết hợp biểu tượng cảm xúc,\ntên và chữ số miễn phí.",
     ),
     (
-      "assets/images/tradein.jpg",
-      "Trade In",
-      "Đổi cũ lấy mới cho thiết bị đang dùng của bạn."
+      "assets/images/shipping.jpg",
+      "Giao hàng miễn phí đến tận nơi",
     ),
   ];
 
@@ -706,12 +707,11 @@ Widget _storeHighlights() {
             horizontal: 24,
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
                 item.$1,
-                width: 90,
-                height: 90,
+                width: 60,
+                height: 60,
               ),
 
               const SizedBox(height: 10),
@@ -721,24 +721,12 @@ Widget _storeHighlights() {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 26,
+                  fontSize: 19,
                   fontWeight: FontWeight.bold,
                 ),
               ),
 
               const SizedBox(height: 10),
-
-              Text(
-                item.$3,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 17,
-                  height: 1.4,
-                ),
-              ),
-
-              const SizedBox(height: 12),
 
               TextButton(
                 onPressed: () {},
@@ -746,7 +734,7 @@ Widget _storeHighlights() {
                   "Tìm hiểu thêm >",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

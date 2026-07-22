@@ -1,26 +1,31 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'data/banner_store.dart';
+import 'data/product_store.dart';
+import 'firebase_options.dart';
+import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
 import 'providers/recently_viewed_provider.dart';
+import 'screens/auth/email_verification_screen.dart';
+import 'screens/auth/login_screen.dart';
 import 'screens/root_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'src/admin/presentation/admin_shell.dart';
+import 'src/core/theme/admin_theme.dart';
 
 void main() async {
-  // 1. Bắt buộc phải có dòng này để Flutter chuẩn bị nền tảng
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // 2. Khởi tạo Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  // 3. Chạy app của bạn (giữ nguyên MultiProvider)
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()..init()),
         ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
+        ChangeNotifierProvider(create: (_) => ProductStore()),
+        ChangeNotifierProvider(create: (_) => BannerStore()),
       ],
       child: const AppleStoreApp(),
     ),
@@ -62,7 +67,28 @@ class AppleStoreApp extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
         ),
       ),
-      home: const RootScreen(),
+      home: const _AuthGate(),
     );
+  }
+}
+
+class _AuthGate extends StatelessWidget {
+  const _AuthGate();
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    if (!auth.isInitialized) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
+    if (!auth.isLoggedIn) return const LoginScreen();
+    if (!auth.isAdmin && !auth.isEmailVerified) return const EmailVerificationScreen();
+    if (auth.isAdmin) {
+      return Theme(data: buildAdminTheme(), child: const AdminShell());
+    }
+    return const RootScreen();
   }
 }

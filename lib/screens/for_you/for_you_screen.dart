@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/../widgets/profile_avatar.dart';
+import '../../widgets/profile_avatar.dart';
 import '../settings/settings_screen.dart';
 import '../../data/mock_data.dart';
 import '../../providers/recently_viewed_provider.dart';
