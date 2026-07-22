@@ -191,7 +191,7 @@ class DiscoverScreen extends StatelessWidget {
 
   Widget _servicesCarousel(BuildContext context) {
     return SizedBox(
-      height: 190,
+      height: 400,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 22),
         scrollDirection: Axis.horizontal,
@@ -209,30 +209,34 @@ class DiscoverScreen extends StatelessWidget {
                     );
                   },
             child: Container(
-              width: 220,
-              margin: const EdgeInsets.only(right: 14),
+              width: 260,
+              margin: const EdgeInsets.only(right: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(30),
               ),
               clipBehavior: Clip.antiAlias,
               child: Column(
                 children: [
-                  Expanded(
-                    child: Image.asset(item.image, fit: BoxFit.cover, width: double.infinity),
-                  ),
-                  Container(
+                  SizedBox(
+                    height: 220,
                     width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      item.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        height: 1.3,
+                    child: Image.asset(item.image, fit: BoxFit.cover),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          height: 1.3,
+                        ),
                       ),
                     ),
                   ),
@@ -258,7 +262,7 @@ class DiscoverScreen extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         const Text(
-          'Cái quần jz',
+          'Iphone 12 Pro',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
