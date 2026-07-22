@@ -9,13 +9,13 @@ class BannerStore extends ChangeNotifier {
   final List<BannerModel> _banners = [
 
     const BannerModel(
-      imagePath: "assets/images/iphone16.jpg",
-      title: "iPhone 16 Pro",
+      imagePath: "assets/images/iphone15_1.jpg",
+      title: "iPhone 15 Pro",
       subtitle: "Apple Intelligence",
     ),
 
     const BannerModel(
-      imagePath: "assets/images/macbook.jpg",
+      imagePath: "assets/images/macbook_pro.jpg",
       title: "MacBook Pro",
       subtitle: "Powerful Performance",
     ),
