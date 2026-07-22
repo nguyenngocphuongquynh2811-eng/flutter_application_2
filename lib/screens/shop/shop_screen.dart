@@ -3,6 +3,7 @@ import '../profile/account_bottom_sheet.dart';
 import '/../widgets/profile_avatar.dart';
 import '../../data/mock_data.dart';
 import 'apple_music_detail_screen.dart';
+import 'apple_fitness_detail_screen.dart';
 
 
 
@@ -156,7 +157,14 @@ class ShopScreen extends StatelessWidget {
                       "assets/images/fitness.jpg",
                       "Fitness+",
                       "Tập luyện mọi lúc.",
-                      null,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AppleFitnessDetailScreen(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
