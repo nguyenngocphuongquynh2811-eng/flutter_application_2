@@ -4,6 +4,7 @@ import '/../widgets/profile_avatar.dart';
 import '../../data/mock_data.dart';
 import 'apple_music_detail_screen.dart';
 import 'apple_fitness_detail_screen.dart';
+import 'iphone_screen.dart';
 
 
 
@@ -246,35 +247,51 @@ class ShopScreen extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 120,
+      height: 110,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
-        itemBuilder: (_, index) {
-          return Container(
-            width: 110,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1C1C1E),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  "assets/images/${items[index].$1}",
-                  height: 50,
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  items[index].$2,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              // Thêm lệnh chuyển trang khi bấm vào "iPhone"
+              if (items[index].$2 == "iPhone") {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const IphoneScreen(),
                   ),
-                )
-              ],
+                );
+              }
+            },
+            child: Container(
+              width: 100,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1C1C1E).withOpacity(0.6),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/${items[index].$1}",
+                    height: 45,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    items[index].$2,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )
+                ],
+              ),
             ),
           );
         },
