@@ -180,7 +180,8 @@ static const List<ShopCard> smallCards = [
     image: "assets/images/airpodsmax.jpg",
     title: "AirPods Max",
     subtitle: "Âm thanh đỉnh cao.",
-    price: "13.499.000đ",
+    price: "Từ 13.499.000đ",
+    priceNote: "hoặc 1.166.625đ/th. trong 24 tháng",
     backgroundColor: Colors.white,
   ),
 
@@ -188,7 +189,8 @@ static const List<ShopCard> smallCards = [
     image: "assets/images/airpods.jpg",
     title: "AirPods Pro",
     subtitle: "Âm thanh không gian.",
-    price: "5.999.000đ",
+    price: "Từ 5.999.000đ",
+    priceNote: "hoặc 1.166.625đ/th. trong 24 tháng",
     backgroundColor: Colors.white,
   ),
 
@@ -196,7 +198,8 @@ static const List<ShopCard> smallCards = [
     image: "assets/images/watch.jpg",
     title: "Apple Watch",
     subtitle: "Theo dõi sức khỏe.",
-    price: "9.999.000đ",
+    price: "Từ 9.999.000đ",
+    priceNote: "hoặc 1.166.625đ/th. trong 24 tháng",
     backgroundColor: Colors.white,
   ),
 ];
