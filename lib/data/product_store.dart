@@ -17,4 +17,20 @@ class ProductStore extends ChangeNotifier {
     _products[index] = updated;
     notifyListeners();
   }
+
+// Lấy sản phẩm theo danh mục — dùng cho màn chia mục
+List<Product> byCategory(String categoryId) =>
+    _products.where((e) => e.categoryId == categoryId).toList();
+
+// Thêm sản phẩm mới
+void addProduct(Product product) {
+  _products.add(product);
+  notifyListeners();
+}
+
+// Xoá sản phẩm
+void deleteProduct(String id) {
+  _products.removeWhere((e) => e.id == id);
+  notifyListeners();
+}
 }

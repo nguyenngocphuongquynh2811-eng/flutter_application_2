@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../data/mock_data.dart';
-import '../../../../data/product_store.dart';
-import '../../../../models/product.dart';
+import '../../../../../data/mock_data.dart';
+import '../../../../../data/product_store.dart';
+import '../../../../../models/product.dart';
 
 class EditProductSheet extends StatefulWidget {
   final Product product;
