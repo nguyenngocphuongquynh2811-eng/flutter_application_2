@@ -5,6 +5,7 @@ import '../../data/mock_data.dart';
 import 'apple_music_detail_screen.dart';
 import 'apple_fitness_detail_screen.dart';
 import 'iphone_screen.dart';
+import 'apple_watch_screen.dart';
 
 
 
@@ -256,12 +257,19 @@ class ShopScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              // Thêm lệnh chuyển trang khi bấm vào "iPhone"
               if (items[index].$2 == "iPhone") {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const IphoneScreen(),
+                  ),
+                );
+              } else if (items[index].$2 == "Apple Watch") {
+                // Thêm dòng này để chuyển hướng sang Apple Watch
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AppleWatchScreen(),
                   ),
                 );
               }
