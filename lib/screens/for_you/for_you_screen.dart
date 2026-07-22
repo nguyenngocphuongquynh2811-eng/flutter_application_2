@@ -8,6 +8,9 @@ import '../settings/notification_screen.dart';
 import '../profile/account_bottom_sheet.dart';
 import '../shop/apple_music_detail_screen.dart';
 import '../shop/apple_fitness_detail_screen.dart';
+import '../shop/apple_icloud_detail_screen.dart';
+import '../shop/apple_pay_detail_screen.dart';
+import '../shop/apple_arcade_detail_screen.dart';
 
 class ForYouScreen extends StatelessWidget {
   const ForYouScreen({super.key});
@@ -18,6 +21,12 @@ class ForYouScreen extends StatelessWidget {
         return const AppleMusicDetailScreen();
       case 'assets/images/apple_fitness.jpg':
         return const AppleFitnessDetailScreen();
+      case 'assets/images/icloud.jpg':
+        return const AppleICloudDetailScreen();
+      case 'assets/images/apple_pay.jpg':
+        return const ApplePayDetailScreen();
+      case 'assets/images/apple_arcade.jpg':
+        return const AppleArcadeDetailScreen();
       default:
         return null;
     }
