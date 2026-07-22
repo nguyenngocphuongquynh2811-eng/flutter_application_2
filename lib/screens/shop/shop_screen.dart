@@ -80,8 +80,7 @@ class ShopScreen extends StatelessWidget {
             _sectionTitle("Khám phá sản phẩm mới"),
 
             SliverToBoxAdapter(
-              child: _newProductsSection(
-              ),
+              child: _newProductsSection(context),
             ),
 
             _sectionTitle("Apple Store tạo nên mọi khác biệt"),
@@ -376,7 +375,7 @@ class ShopScreen extends StatelessWidget {
       ),
     );
   }
-  static Widget _newProductsSection() {
+  static Widget _newProductsSection(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 22),
     child: Column(
@@ -450,7 +449,8 @@ class ShopScreen extends StatelessWidget {
                             product.subtitle,
                             style: const TextStyle(
                               color: Colors.white70,
-                              fontSize: 15,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
 
@@ -519,112 +519,112 @@ class ShopScreen extends StatelessWidget {
         const SizedBox(height: 10),
 
         // CARD NHỎ
-        SizedBox(
-          height: 380,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: MockData.smallCards.length,
-            itemBuilder: (context, index) {
-              final product = MockData.smallCards[index];
+        
+SizedBox(
+  height: 360,
+  child: ListView.builder(
+    scrollDirection: Axis.horizontal,
+    itemCount: MockData.smallCards.length,
+    itemBuilder: (context, index) {
+      final product = MockData.smallCards[index];
 
-              return Container(
-                width: 280,
-                margin: const EdgeInsets.only(right: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(28),
+      return Container(
+        width: 280,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Image.asset(
+                  product.image,
+                  fit: BoxFit.contain,
                 ),
-                clipBehavior: Clip.antiAlias,
+              ),
+            ),
+
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                padding: const EdgeInsets.all(18),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black87,
+                      Colors.black54,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
-                  // ẢNH
-                    Expanded(
-                      flex: 7,
+                    Text(
+                      product.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    Text(
+                      product.price,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Align(
+                      alignment: Alignment.centerRight,
                       child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        alignment: Alignment.center,
-                        child: Image.asset(
-                          product.image,
-                          fit: BoxFit.contain,
+                        padding:
+                            const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          "Mua",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight:
+                                FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                    // THÔNG TIN
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(
-                          18,
-                          12,
-                          18,
-                          14,
-                        ),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                              color: Color(0xFFEAEAEA),
-                            ),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              product.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 4),
-                            Text(
-                              product.price,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
-                            ),
-
-                            const Spacer(),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                padding:
-                                const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                 color: Colors.black,
-                                  borderRadius:
-                                  BorderRadius.circular(20),
-                                ),
-                                child: const Text(
-                                  "Mua",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight:
-                                    FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),  
-                      ),  
-                    ),
                   ],
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ),
+      );
+    },
+  ),
+)
       ],
     ),
   );
