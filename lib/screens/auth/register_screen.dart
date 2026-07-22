@@ -45,7 +45,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error), backgroundColor: Colors.redAccent),
       );
+      return;
     }
+
+    // Registration succeeded: pop back to the root so the reactive AuthGate
+    // in main.dart can swap in the email verification screen underneath.
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override

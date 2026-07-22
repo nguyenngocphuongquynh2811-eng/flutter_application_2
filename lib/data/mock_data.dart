@@ -1,6 +1,8 @@
 import '../models/product.dart';
 import '../models/category.dart';
 import '../models/promo_card.dart';
+import '../models/shop_card.dart';
+import 'package:flutter/material.dart';
 
 class MockData {
   static const List<Category> categories = [
@@ -150,4 +152,52 @@ class MockData {
       subtitle: 'Chơi hàng trăm game mà không bị gián đoạn bởi quảng cáo.',
     ),
   ];
+  
+  static const List<ShopCard> bigCards = [
+  ShopCard(
+    image: "assets/images/macbook_neo.jpg",
+    title: "MacBook Neo",
+    subtitle: "Điều tuyệt diệu của Mac.",
+    price: "Từ 24.999.000đ",
+    priceNote: "hoặc 1.041.625đ/th. trong 24 tháng",
+    tag: "Mới",
+    backgroundColor: Colors.white,
+  ),
+
+  ShopCard(
+    image: "assets/images/iphone17.jpg",
+    title: "iPhone 17",
+    subtitle: "Mạnh mẽ với chip M4.",
+    price: "Từ 27.999.000đ",
+    priceNote: "hoặc 1.166.625đ/th. trong 24 tháng",
+    tag: "Mới",
+    backgroundColor: Colors.black,
+  ),
+];
+
+static const List<ShopCard> smallCards = [
+  ShopCard(
+    image: "assets/images/airpodsmax.jpg",
+    title: "AirPods Max",
+    subtitle: "Âm thanh đỉnh cao.",
+    price: "13.499.000đ",
+    backgroundColor: Colors.white,
+  ),
+
+  ShopCard(
+    image: "assets/images/airpods.jpg",
+    title: "AirPods Pro",
+    subtitle: "Âm thanh không gian.",
+    price: "5.999.000đ",
+    backgroundColor: Colors.white,
+  ),
+
+  ShopCard(
+    image: "assets/images/watch.jpg",
+    title: "Apple Watch",
+    subtitle: "Theo dõi sức khỏe.",
+    price: "9.999.000đ",
+    backgroundColor: Colors.white,
+  ),
+];
 }

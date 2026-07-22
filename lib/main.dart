@@ -1,13 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
+import 'screens/auth/email_verification_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/root_screen.dart';
 import 'src/admin/presentation/admin_shell.dart';
 import 'src/core/theme/admin_theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(
     MultiProvider(
       providers: [
@@ -72,6 +79,7 @@ class _AuthGate extends StatelessWidget {
       );
     }
     if (!auth.isLoggedIn) return const LoginScreen();
+    if (!auth.isAdmin && !auth.isEmailVerified) return const EmailVerificationScreen();
     if (auth.isAdmin) {
       return Theme(data: buildAdminTheme(), child: const AdminShell());
     }

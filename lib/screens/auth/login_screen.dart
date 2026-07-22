@@ -79,11 +79,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 40),
                 AuthTextField(
                   controller: _emailController,
-                  hint: 'Email hoặc tên đăng nhập',
-                  icon: Icons.person_outline,
+                  hint: 'Email',
+                  icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) return 'Vui lòng nhập email hoặc tên đăng nhập';
+                    if (value == null || value.trim().isEmpty) return 'Vui lòng nhập email';
+                    if (!value.contains('@')) return 'Email không hợp lệ';
                     return null;
                   },
                 ),

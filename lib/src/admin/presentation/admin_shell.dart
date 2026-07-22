@@ -4,21 +4,18 @@ import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
 
-/// Mô tả một mục trong sidebar.
 class NavItem {
   const NavItem({
     required this.label,
     required this.icon,
+    required this.activeIcon,
     required this.screen,
-    this.group,
   });
 
   final String label;
-  final IconData icon;
+  final IconData icon;       // icon lúc chưa chọn
+  final IconData activeIcon; // icon lúc đang chọn, đậm hơn
   final Widget screen;
-
-  /// Tiêu đề nhóm hiện phía trên mục này. Null thì không hiện.
-  final String? group;
 }
 
 class AdminShell extends StatefulWidget {
@@ -31,80 +28,66 @@ class AdminShell extends StatefulWidget {
 class _AdminShellState extends State<AdminShell> {
   int _index = 0;
 
-  // Tạm dùng màn hình rỗng, thay dần bằng màn thật ở các bước sau.
   static const _items = <NavItem>[
     NavItem(
       label: 'Sản phẩm',
       icon: Icons.inventory_2_outlined,
+      activeIcon: Icons.inventory_2,
       screen: _Placeholder('Quản lý sản phẩm'),
-      group: 'Bán hàng',
     ),
     NavItem(
       label: 'Đơn hàng',
       icon: Icons.receipt_long_outlined,
+      activeIcon: Icons.receipt_long,
       screen: _Placeholder('Quản lý đơn hàng'),
     ),
     NavItem(
       label: 'Khuyến mãi',
       icon: Icons.local_offer_outlined,
+      activeIcon: Icons.local_offer,
       screen: _Placeholder('Quản lý khuyến mãi'),
-      group: 'Marketing',
     ),
     NavItem(
       label: 'Tài khoản',
       icon: Icons.people_outline,
+      activeIcon: Icons.people,
       screen: _Placeholder('Quản lý tài khoản'),
-      group: 'Hệ thống',
+    ),
+    NavItem(
+      label: 'Cài đặt',
+      icon: Icons.settings_outlined,
+      activeIcon: Icons.settings,
+      screen: _Placeholder('Cài đặt'),
+    ),
+    NavItem(
+      label: 'Profile',
+      icon: Icons.person_outline,
+      activeIcon: Icons.person,
+      screen: _Placeholder('Profile'),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.sizeOf(context).width >= 1000;
-
-    final content = Column(
-      children: [
-        _TopBar(title: _items[_index].label, showMenuButton: !isWide),
-        Expanded(child: _items[_index].screen),
-      ],
-    );
-
     return Scaffold(
-      drawer: isWide
-          ? null
-          : Drawer(
-              backgroundColor: const Color.fromARGB(255, 38, 41, 56),
-              child: _Sidebar(
-                items: _items,
-                index: _index,
-                onSelect: (i) {
-                  setState(() => _index = i);
-                  Navigator.pop(context); // đóng drawer sau khi chọn
-                },
-              ),
-            ),
-      body: isWide
-          ? Row(
-              children: [
-                Container(
-                  width: 250,
-                  color: const Color.fromARGB(255, 38, 41, 56),
-                  child: _Sidebar(
-                    items: _items,
-                    index: _index,
-                    onSelect: (i) => setState(() => _index = i),
-                  ),
-                ),
-                Expanded(child: content),
-              ],
-            )
-          : content,
+      body: Column(
+        children: [
+          _TopBar(title: _items[_index].label),
+          Expanded(child: _items[_index].screen),
+        ],
+      ),
+      bottomNavigationBar: _ScrollableBottomBar(
+        items: _items,
+        index: _index,
+        onSelect: (i) => setState(() => _index = i),
+      ),
     );
   }
 }
 
-class _Sidebar extends StatelessWidget {
-  const _Sidebar({
+/// Thanh điều hướng dưới đáy, cuộn ngang được khi nhiều mục.
+class _ScrollableBottomBar extends StatelessWidget {
+  const _ScrollableBottomBar({
     required this.items,
     required this.index,
     required this.onSelect,
@@ -116,152 +99,148 @@ class _Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 22, 20, 10),
-            child: Row(
-              children: [
-                SizedBox(width: 10),
-                Text(
-                  'ADMIN ',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.6,
-                    fontSize: 13,
+    return Container(
+      decoration: const BoxDecoration(
+        color: AdminColors.surface,
+        border: Border(top: BorderSide(color: AdminColors.border)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 68,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            itemCount: items.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 6),
+            itemBuilder: (context, i) {
+              final item = items[i];
+              final selected = i == index;
+
+              return Material(
+                color: selected
+                    ? AdminColors.accent.withValues(alpha: 0.18)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(14),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () => onSelect(i),
+                  child: Container(
+                    width: 78,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          selected ? item.activeIcon : item.icon,
+                          size: 22,
+                          color: selected
+                              ? AdminColors.accent
+                              : AdminColors.textDim,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: selected
+                                ? AdminColors.accent
+                                : AdminColors.textDim,
+                            fontWeight:
+                                selected ? FontWeight.w600 : FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, i) {
-                final item = items[i];
-                final selected = i == index;
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (item.group != null)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
-                        child: Text(
-                          item.group!.toUpperCase(),
-                          style: const TextStyle(
-                            color: Color(0xFF6B77A8),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                      child: Material(
-                        color: selected
-                            ? AdminColors.sidebarActive
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(10),
-                          onTap: () => onSelect(i),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 11),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  item.icon,
-                                  size: 19,
-                                  color: selected
-                                      ? Colors.white
-                                      : AdminColors.sidebarText,
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  item.label,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: selected
-                                        ? Colors.white
-                                        : AdminColors.sidebarText,
-                                    fontWeight: selected
-                                        ? FontWeight.w600
-                                        : FontWeight.normal,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-          const Divider(color: Colors.white24, height: 1),
-          ListTile(
-            leading: const Icon(Icons.logout,
-                color: AdminColors.sidebarText, size: 20),
-            title: const Text('Đăng xuất',
-                style: TextStyle(color: AdminColors.sidebarText, fontSize: 14)),
-            onTap: () => context.read<AuthProvider>().logout(),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.title, required this.showMenuButton});
+  const _TopBar({required this.title});
 
   final String title;
-  final bool showMenuButton;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
+    return Container(
+      decoration: const BoxDecoration(
+        color: AdminColors.background,
+        border: Border(bottom: BorderSide(color: AdminColors.border)),
+      ),
       child: SafeArea(
         bottom: false,
-        child: Container(
-          height: 60,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: AdminColors.border)),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
           child: Row(
             children: [
-              if (showMenuButton)
-                Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
-                  ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Apple Store',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AdminColors.textDim,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              const SizedBox(width: 8),
-              Text(title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600)),
-              const Spacer(),
-              const CircleAvatar(
-                radius: 16,
-                backgroundColor: AdminColors.sidebarActive,
-                child: Text('TH',
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
               ),
-              const SizedBox(width: 10),
-              const Text('Tường', style: TextStyle(fontSize: 13)),
-              const SizedBox(width: 8),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_none,
+                    color: AdminColors.textDim),
+              ),
+              const SizedBox(width: 4),
+              PopupMenuButton<String>(
+                offset: const Offset(0, 44),
+                onSelected: (value) {
+                  if (value == 'logout') context.read<AuthProvider>().logout();
+                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem(
+                    value: 'logout',
+                    child: Row(
+                      children: [
+                        Icon(Icons.logout, size: 18, color: Colors.redAccent),
+                        SizedBox(width: 10),
+                        Text('Đăng xuất'),
+                      ],
+                    ),
+                  ),
+                ],
+                child: const CircleAvatar(
+                  radius: 17,
+                  backgroundColor: AdminColors.accent,
+                  child: Text('AD',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600)),
+                ),
+              ),
             ],
           ),
         ),
@@ -270,7 +249,6 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-/// Màn hình tạm, sẽ thay bằng màn thật.
 class _Placeholder extends StatelessWidget {
   const _Placeholder(this.text);
 
@@ -280,7 +258,7 @@ class _Placeholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(text,
-          style: const TextStyle(fontSize: 18, color: Colors.black45)),
+          style: const TextStyle(fontSize: 16, color: AdminColors.textDim)),
     );
   }
 }
