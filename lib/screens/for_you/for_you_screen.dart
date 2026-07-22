@@ -7,9 +7,21 @@ import '../../providers/recently_viewed_provider.dart';
 import '../settings/notification_screen.dart';
 import '../profile/account_bottom_sheet.dart';
 import '../shop/apple_music_detail_screen.dart';
+import '../shop/apple_fitness_detail_screen.dart';
 
 class ForYouScreen extends StatelessWidget {
   const ForYouScreen({super.key});
+
+  static Widget? _detailScreenFor(String image) {
+    switch (image) {
+      case 'assets/images/apple_music.jpg':
+        return const AppleMusicDetailScreen();
+      case 'assets/images/apple_fitness.jpg':
+        return const AppleFitnessDetailScreen();
+      default:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,19 +100,18 @@ class ForYouScreen extends StatelessWidget {
                               itemCount: recentlyViewed.items.length,
                               itemBuilder: (context, index) {
                                 final item = recentlyViewed.items[index];
+                                final screen = _detailScreenFor(item.image);
                                 return GestureDetector(
-                                  onTap: item.image ==
-                                          'assets/images/apple_music.jpg'
-                                      ? () {
+                                  onTap: screen == null
+                                      ? null
+                                      : () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (_) =>
-                                                  const AppleMusicDetailScreen(),
+                                              builder: (_) => screen,
                                             ),
                                           );
-                                        }
-                                      : null,
+                                        },
                                   child: Container(
                                   width: 200,
                                   margin: const EdgeInsets.only(right: 16),
@@ -268,21 +279,21 @@ class ForYouScreen extends StatelessWidget {
                       itemCount: MockData.promoCards.length,
                       itemBuilder: (context, index) {
                         final item = MockData.promoCards[index];
+                        final screen = _detailScreenFor(item.image);
                         return GestureDetector(
-                          onTap: item.image == 'assets/images/apple_music.jpg'
-                              ? () {
+                          onTap: screen == null
+                              ? null
+                              : () {
                                   context
                                       .read<RecentlyViewedProvider>()
                                       .markViewed(item);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) =>
-                                          const AppleMusicDetailScreen(),
+                                      builder: (_) => screen,
                                     ),
                                   );
-                                }
-                              : null,
+                                },
                           child: Container(
                           width: 260,
                           margin: const EdgeInsets.only(right: 16),
