@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_2/src/product/product_page.dart';
+import 'package:flutter_application_2/src/product/admin_shop_screen.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
@@ -34,7 +34,7 @@ class _AdminShellState extends State<AdminShell> {
       label: 'Sản phẩm',
       icon: Icons.inventory_2_outlined,
       activeIcon: Icons.inventory_2,
-      screen: ProductPage(),
+      screen: AdminShopScreen(),
     ),
     NavItem(
       label: 'Đơn hàng',
@@ -71,12 +71,7 @@ class _AdminShellState extends State<AdminShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          _TopBar(title: _items[_index].label),
-          Expanded(child: _items[_index].screen),
-        ],
-      ),
+      body: _items[_index].screen,
       bottomNavigationBar: _ScrollableBottomBar(
         items: _items,
         index: _index,

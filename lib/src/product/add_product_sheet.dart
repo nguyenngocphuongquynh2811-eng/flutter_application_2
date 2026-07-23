@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../data/mock_data.dart';
-import '../../../data/product_store.dart';
-import '../../../models/product.dart';
+import '../../data/mock_data.dart';
+import '../../data/product_store.dart';
+import '../../models/product.dart';
 
 class AddProductSheet extends StatefulWidget {
   final String categoryId;
