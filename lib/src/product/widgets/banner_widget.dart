@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/banner_store.dart';
-import '../../product/edit_banner_sheet.dart';
+import '../sheet/edit_banner_sheet.dart';
 import 'banner_card.dart';
 
 class BannerWidget extends StatelessWidget {
