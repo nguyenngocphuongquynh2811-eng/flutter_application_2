@@ -4,6 +4,7 @@ import 'package:flutter_application_2/src/product/product_page.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
+import 'account_management_page.dart';
 
 class NavItem {
   const NavItem({
@@ -52,7 +53,7 @@ class _AdminShellState extends State<AdminShell> {
       label: 'Tài khoản',
       icon: Icons.people_outline,
       activeIcon: Icons.people,
-      screen: _Placeholder('Quản lý tài khoản'),
+      screen: AccountManagementPage(),
     ),
     NavItem(
       label: 'Thống kê',

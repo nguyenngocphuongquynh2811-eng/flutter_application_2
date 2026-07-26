@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/app_user.dart';
@@ -140,6 +141,91 @@ class AuthProvider with ChangeNotifier {
         return 'Vui lòng đăng xuất và đăng nhập lại trước khi xóa tài khoản.';
       }
       return e.message ?? 'Không thể xóa tài khoản.';
+    }
+  }
+
+  /// Live list of every account (both roles) for the admin account-management screen.
+  Stream<QuerySnapshot<Map<String, dynamic>>> watchAllUsers() {
+    return _firestore.collection('users').orderBy('name').snapshots();
+  }
+
+  /// Creates a brand-new login (user or admin) from inside the admin panel.
+  ///
+  /// Uses a secondary, throwaway [FirebaseApp] instance so that signing the
+  /// new account in (an unavoidable side effect of the client-only
+  /// `createUserWithEmailAndPassword` call) does not sign the admin who is
+  /// performing this action out of their own session.
+  Future<String?> createAccountAsAdmin({
+    required String name,
+    required String email,
+    required String password,
+    required String role,
+  }) async {
+    FirebaseApp secondaryApp;
+    try {
+      try {
+        secondaryApp = Firebase.app('admin_provisioning');
+      } catch (_) {
+        secondaryApp = await Firebase.initializeApp(
+          name: 'admin_provisioning',
+          options: Firebase.app().options,
+        );
+      }
+      final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+
+      final credential = await secondaryAuth.createUserWithEmailAndPassword(
+        email: email.trim().toLowerCase(),
+        password: password,
+      );
+      final newUser = credential.user!;
+      await newUser.updateDisplayName(name.trim());
+      await _firestore.collection('users').doc(newUser.uid).set({
+        'name': name.trim(),
+        'email': email.trim().toLowerCase(),
+        'role': role,
+      });
+      await secondaryAuth.signOut();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return _mapAuthError(e);
+    } catch (e) {
+      return 'Không thể tạo tài khoản: $e';
+    }
+  }
+
+  /// Edits the display name / role of any account. Email and password belong
+  /// to Firebase Auth and can only be changed by that account itself, so they
+  /// are intentionally not editable from here.
+  Future<String?> updateUserProfile(
+    String uid, {
+    required String name,
+    required String role,
+  }) async {
+    try {
+      await _firestore.collection('users').doc(uid).update({
+        'name': name.trim(),
+        'role': role,
+      });
+      if (uid == _auth.currentUser?.uid) {
+        await _loadUser(_auth.currentUser!);
+      }
+      return null;
+    } catch (e) {
+      return 'Không thể cập nhật tài khoản: $e';
+    }
+  }
+
+  /// Removes an account's profile/role data from Firestore. This does NOT
+  /// delete the underlying Firebase Authentication login — the client SDK
+  /// can only ever delete the *currently signed-in* user, never another
+  /// account, so fully revoking someone else's login requires a backend
+  /// (Cloud Functions + Admin SDK), which this project doesn't have.
+  Future<String?> deleteUserProfile(String uid) async {
+    try {
+      await _firestore.collection('users').doc(uid).delete();
+      return null;
+    } catch (e) {
+      return 'Không thể xóa tài khoản: $e';
     }
   }
 
