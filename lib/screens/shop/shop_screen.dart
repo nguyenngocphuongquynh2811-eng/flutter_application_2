@@ -278,7 +278,7 @@ class ShopScreen extends StatelessWidget {
               width: 100,
               margin: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF1C1C1E).withOpacity(0.6),
+                color: const Color(0xFF1C1C1E).withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.white12),
               ),
@@ -395,7 +395,7 @@ class ShopScreen extends StatelessWidget {
                               item.overline!,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: item.textColor.withOpacity(0.6),
+                                color: item.textColor.withValues(alpha: 0.6),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -420,7 +420,7 @@ class ShopScreen extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 15,
-                              color: item.textColor.withOpacity(0.6),
+                              color: item.textColor.withValues(alpha: 0.6),
                               height: 1.4,
                             ),
                           ),
