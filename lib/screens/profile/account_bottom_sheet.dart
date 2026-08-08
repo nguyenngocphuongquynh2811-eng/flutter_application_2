@@ -22,34 +22,8 @@ class _AccountBottomSheetState extends State<AccountBottomSheet> {
   bool _isUploadingAvatar = false;
 
   Future<void> _pickAvatar() async {
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      backgroundColor: const Color(0xFF2C2C2E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt_outlined, color: Colors.white),
-              title: const Text('Chụp ảnh', style: TextStyle(color: Colors.white)),
-              onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined, color: Colors.white),
-              title: const Text('Chọn từ thư viện', style: TextStyle(color: Colors.white)),
-              onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (source == null || !mounted) return;
-
     final picked = await ImagePicker().pickImage(
-      source: source,
+      source: ImageSource.gallery,
       maxWidth: 512,
       maxHeight: 512,
       imageQuality: 70,

@@ -1,68 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import 'checkout_screen.dart';
 
-class CartScreen extends StatefulWidget {
+class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
-
-  @override
-  State<CartScreen> createState() => _CartScreenState();
-}
-
-class _CartScreenState extends State<CartScreen> {
-  bool _isCheckingOut = false;
-
-  Future<void> _checkout(CartProvider cart) async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
-
-    setState(() => _isCheckingOut = true);
-
-    final user = context.read<AuthProvider>().currentUser;
-    try {
-      await FirebaseFirestore.instance.collection('orders').add({
-        'userId': uid,
-        'userName': user?.name ?? '',
-        'userEmail': user?.email ?? '',
-        'items': cart.items.values
-            .map((cartItem) => {
-                  'productId': cartItem.product.id,
-                  'name': cartItem.product.name,
-                  'price': cartItem.product.price,
-                  'quantity': cartItem.quantity,
-                  'imagePath': cartItem.product.imagePaths.isNotEmpty
-                      ? cartItem.product.imagePaths[0]
-                      : '',
-                })
-            .toList(),
-        'totalAmount': cart.totalAmount,
-        'status': 'Đang xử lý',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
-      cart.clear();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Thanh toán thành công!'),
-          backgroundColor: Colors.blueAccent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Thanh toán thất bại: $e'), backgroundColor: Colors.redAccent),
-      );
-    } finally {
-      if (mounted) setState(() => _isCheckingOut = false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,21 +152,22 @@ class _CartScreenState extends State<CartScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: _isCheckingOut ? null : () => _checkout(cart),
-                        child: _isCheckingOut
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                              )
-                            : const Text(
-                                'Thanh toán',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CheckoutScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Thanh toán',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ],

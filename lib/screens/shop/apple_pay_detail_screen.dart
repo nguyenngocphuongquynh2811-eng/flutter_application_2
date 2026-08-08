@@ -9,7 +9,9 @@ class ApplePayDetailScreen extends StatelessWidget {
       const SnackBar(
         content: Text('Đã mở Ví để thêm thẻ!'),
         duration: Duration(seconds: 2),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blueAccent,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
       ),
     );
   }

@@ -9,7 +9,9 @@ class AppleICloudDetailScreen extends StatelessWidget {
       const SnackBar(
         content: Text('Đã bắt đầu nâng cấp iCloud+!'),
         duration: Duration(seconds: 2),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blueAccent,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
       ),
     );
   }

@@ -37,7 +37,12 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     setState(() => _isResending = false);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã gửi lại email xác nhận.'), backgroundColor: Colors.green),
+      const SnackBar(
+        content: Text('Đã gửi lại email xác nhận.'),
+        backgroundColor: Colors.blueAccent,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
+      ),
     );
   }
 
