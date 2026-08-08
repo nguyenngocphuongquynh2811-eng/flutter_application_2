@@ -118,6 +118,20 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<String?> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim().toLowerCase());
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        return 'Không tìm thấy tài khoản với email này.';
+      }
+      return _mapAuthError(e);
+    } catch (e) {
+      return 'Không thể gửi email đặt lại mật khẩu: $e';
+    }
+  }
+
   Future<void> logout() async {
     await _auth.signOut();
     _currentUser = null;
