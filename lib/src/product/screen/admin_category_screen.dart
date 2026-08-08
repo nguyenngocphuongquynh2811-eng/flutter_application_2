@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-import '../../models/category.dart';
-import '../../models/product.dart';
-import '../../data/product_store.dart';
-import 'admin_product_view_page.dart';
-import 'add_product_sheet.dart';
+import '../../../models/category.dart';
+import '../../../models/product.dart';
+import '../../../data/product_store.dart';
+import '../admin_product_view_page.dart';
+import '../sheet/add_product_sheet.dart';
 
 class AdminCategoryScreen extends StatelessWidget {
   final Category category;

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../screens/profile/account_bottom_sheet.dart';
-import '../../widgets/profile_avatar.dart';
-import '../../data/mock_data.dart';
-import '../../screens/shop/apple_music_detail_screen.dart';
-import '../../screens/shop/apple_fitness_detail_screen.dart';
-import '../../data/cart_data.dart';
+import '../../../screens/profile/account_bottom_sheet.dart';
+import '../../../widgets/profile_avatar.dart';
+import '../../../data/mock_data.dart';
+import '../../../screens/shop/apple_music_detail_screen.dart';
+import '../../../screens/shop/apple_fitness_detail_screen.dart';
+import '../../../data/cart_data.dart';
 import 'admin_category_screen.dart';
-import 'widgets/banner_widget.dart';
+import 'admin_iphone_screen.dart';
+import 'admin_watch_screen.dart';   // thêm đầu file
+import '../widgets/banner_widget.dart';
 
 class AdminShopScreen extends StatelessWidget {
   const AdminShopScreen({super.key});
@@ -256,14 +258,31 @@ class AdminShopScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              final cat = MockData.categories
-                  .firstWhere((e) => e.id == items[index].$3);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => AdminCategoryScreen(category: cat),
-                ),
-              );
+              if (items[index].$3 == 'c2') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AdminIphoneScreen(),
+                  ),
+                );
+              } else if (items[index].$3 == 'c4') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AdminWatchScreen(),
+                  ),
+                );
+              }
+              else {
+                final cat = MockData.categories
+                    .firstWhere((e) => e.id == items[index].$3);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AdminCategoryScreen(category: cat),
+                  ),
+                );
+              }
             },
             child: Container(
               width: 100,

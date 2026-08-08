@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_2/src/product/admin_shop_screen.dart';
+import 'package:flutter_application_2/src/product/screen/admin_shop_screen.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';

@@ -27,9 +27,9 @@ class _EditProductSheetState extends State<EditProductSheet> {
 
   late TextEditingController descController;
 
-  late String editedName;
+  late TextEditingController NameController;
 
-  late double editedPrice;
+  late TextEditingController PriceController;
 
   late List<String> allImages;
 
@@ -44,9 +44,9 @@ class _EditProductSheetState extends State<EditProductSheet> {
     descController =
         TextEditingController(text: widget.product.description);
 
-    editedName = widget.product.name;
+    NameController = TextEditingController(text: widget.product.name);
 
-    editedPrice = widget.product.price;
+    PriceController = TextEditingController(text: widget.product.price.toString());
 
     allImages = MockData.featuredProducts
         .expand((e) => e.imagePaths)
@@ -56,6 +56,8 @@ class _EditProductSheetState extends State<EditProductSheet> {
 
   @override
   void dispose() {
+    NameController.dispose();
+    PriceController.dispose();
     descController.dispose();
     super.dispose();
   }
@@ -249,7 +251,7 @@ class _EditProductSheetState extends State<EditProductSheet> {
               const SizedBox(height: 10),
 
               Text(
-                editedName,
+                NameController.text,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -259,7 +261,7 @@ class _EditProductSheetState extends State<EditProductSheet> {
               const SizedBox(height: 5),
 
               Text(
-                "${NumberFormat("#,###", "vi_VN").format(editedPrice)} ₫",
+                "${NumberFormat("#,###", "vi_VN").format(double.parse(PriceController.text))} ₫",
                 style: const TextStyle(
                   color: Colors.grey,
                 ),
@@ -292,8 +294,8 @@ class _EditProductSheetState extends State<EditProductSheet> {
                               ),
                               onTap: () {
                                 setState(() {
-                                  editedName = p.name;
-                                  editedPrice = p.price;
+                                  NameController.text = p.name;
+                                  PriceController.text = p.price.toString();
                                 });
 
                                 Navigator.pop(context);
@@ -305,7 +307,32 @@ class _EditProductSheetState extends State<EditProductSheet> {
                     },
                   );
                 },
-                child: const Text("Đổi sản phẩm"),
+                child: const Text("Chọn sản phẩm mẫu"),
+              ),
+
+              const SizedBox(height: 20),
+              const Text("Tên sản phẩm",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              TextField(
+                controller: NameController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "Nhập tên sản phẩm",
+                ),
+              ),
+
+              const SizedBox(height: 20),
+              const Text("Giá (₫)",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              TextField(
+                controller: PriceController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "Nhập giá",
+                ),
               ),
 
               const SizedBox(height: 30),
@@ -319,8 +346,8 @@ class _EditProductSheetState extends State<EditProductSheet> {
                   ),
                   onPressed: () {
                     final updated = widget.product.copyWith(
-                      name: editedName,
-                      price: editedPrice,
+                      name: NameController.text.trim(),
+                      price: double.tryParse(PriceController.text.replaceAll(".", "")) ?? widget.product.price,
                       description: descController.text,
                       imagePaths: editedImages,
                     );
