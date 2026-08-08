@@ -1,11 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../profile/account_bottom_sheet.dart';
 import '/../widgets/profile_avatar.dart';
 import '../../data/mock_data.dart';
+import '../../models/product.dart';
+import '../../models/shop_card.dart';
+import '../../providers/cart_provider.dart';
 import 'apple_music_detail_screen.dart';
 import 'apple_fitness_detail_screen.dart';
 import 'iphone_screen.dart';
 import 'apple_watch_screen.dart';
+
+double _parseVndPrice(String price) {
+  final digits = price.replaceAll(RegExp(r'[^0-9]'), '');
+  return double.tryParse(digits) ?? 0;
+}
+
+void _addShopCardToCart(BuildContext context, ShopCard card) {
+  final product = Product(
+    id: card.title,
+    name: card.title,
+    description: card.subtitle,
+    price: _parseVndPrice(card.price),
+    imagePaths: [card.image],
+    categoryId: "shop-card",
+  );
+  Provider.of<CartProvider>(context, listen: false).addItem(product);
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('${product.name} đã được thêm vào giỏ hàng.'),
+      duration: const Duration(seconds: 2),
+      backgroundColor: Colors.blueAccent,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    ),
+  );
+}
 
 
 
@@ -549,7 +579,8 @@ class ShopScreen extends StatelessWidget {
                               ),
 
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () =>
+                                    _addShopCardToCart(context, product),
                                 style:
                                     ElevatedButton.styleFrom(
                                   backgroundColor:
@@ -723,7 +754,7 @@ SizedBox(
       const SizedBox(width: 10),
 
       ElevatedButton(
-        onPressed: () {},
+        onPressed: () => _addShopCardToCart(context, product),
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(70, 40),
           backgroundColor: Colors.white,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/product.dart';
+import '../../providers/cart_provider.dart';
 
 class AppleWatchScreen extends StatelessWidget {
   const AppleWatchScreen({super.key});
@@ -46,7 +49,7 @@ class AppleWatchScreen extends StatelessWidget {
 
           // DANH SÁCH SẢN PHẨM APPLE WATCH (Series 11, SE 3, Ultra 3)
           SliverToBoxAdapter(
-            child: _watchHeroCarousel(),
+            child: _watchHeroCarousel(context),
           ),
 
           _sectionTitle("Tìm hiểu sâu hơn"),
@@ -177,7 +180,7 @@ class AppleWatchScreen extends StatelessWidget {
 
           // PHỤ KIỆN CAROUSEL (Dây đeo)
           SliverToBoxAdapter(
-            child: _accessoriesCarousel(),
+            child: _accessoriesCarousel(context),
           ),
 
           // DUYỆT XEM PHỤ KIỆN (Pills)
@@ -284,28 +287,34 @@ class AppleWatchScreen extends StatelessWidget {
     );
   }
 
-  Widget _watchHeroCarousel() {
+  Widget _watchHeroCarousel(BuildContext context) {
     final watches = [
       {
+        "id": "watch-series-11",
         "image": "assets/images/watch_cat.jpg",
         "colors": [Colors.grey, Colors.white, Colors.pink, Colors.black, Colors.brown, Colors.black87],
         "name": "Apple Watch Series 11",
         "desc": "Giải pháp tối thượng để theo dõi sức khỏe.",
-        "price": "Từ 11.499.000đ hoặc 468.000đ/th. trong 24 tháng"
+        "price": "Từ 11.499.000đ hoặc 468.000đ/th. trong 24 tháng",
+        "priceValue": 11499000.0,
       },
       {
+        "id": "watch-se-3",
         "image": "assets/images/watch_cat.jpg",
         "colors": [Colors.blueGrey, Colors.white],
         "name": "Apple Watch SE 3",
         "desc": "Những tính năng sức khỏe thiết yếu với giá hấp dẫn.",
-        "price": "Từ 6.999.000đ hoặc 285.000đ/th. trong 24 tháng"
+        "price": "Từ 6.999.000đ hoặc 285.000đ/th. trong 24 tháng",
+        "priceValue": 6999000.0,
       },
       {
+        "id": "watch-ultra-3",
         "image": "assets/images/watch_ultra.jpg",
         "colors": [Colors.grey, Colors.white],
         "name": "Apple Watch Ultra 3",
         "desc": "Chiếc đồng hồ tuyệt đỉnh cho thể thao và phiêu lưu.",
-        "price": "Từ 23.999.000đ hoặc 977.000đ/th. trong 24 tháng"
+        "price": "Từ 23.999.000đ hoặc 977.000đ/th. trong 24 tháng",
+        "priceValue": 23999000.0,
       }
     ];
 
@@ -378,7 +387,27 @@ class AppleWatchScreen extends StatelessWidget {
                 Row(
                   children: [
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        final product = Product(
+                          id: watch["id"] as String,
+                          name: watch["name"] as String,
+                          description: watch["desc"] as String,
+                          price: watch["priceValue"] as double,
+                          imagePaths: [watch["image"] as String],
+                          categoryId: "watch",
+                        );
+                        Provider.of<CartProvider>(context, listen: false)
+                            .addItem(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${product.name} đã được thêm vào giỏ hàng.'),
+                            duration: const Duration(seconds: 2),
+                            backgroundColor: Colors.blueAccent,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
                         foregroundColor: Colors.white,
@@ -458,10 +487,22 @@ class AppleWatchScreen extends StatelessWidget {
     );
   }
 
-  Widget _accessoriesCarousel() {
+  Widget _accessoriesCarousel(BuildContext context) {
     final accessories = [
-      {"image": "assets/images/watch.jpg", "name": "Dây Đeo Thể Thao Màu Cam Clementine 46mm - M/L", "price": "1.499.000đ"},
-      {"image": "assets/images/watch.jpg", "name": "Dây Quấn Milan Màu Gold 46mm - M/L", "price": "2.999.000đ"},
+      {
+        "id": "watch-band-clementine",
+        "image": "assets/images/watch.jpg",
+        "name": "Dây Đeo Thể Thao Màu Cam Clementine 46mm - M/L",
+        "price": "1.499.000đ",
+        "priceValue": 1499000.0,
+      },
+      {
+        "id": "watch-band-milan-gold",
+        "image": "assets/images/watch.jpg",
+        "name": "Dây Quấn Milan Màu Gold 46mm - M/L",
+        "price": "2.999.000đ",
+        "priceValue": 2999000.0,
+      },
     ];
 
     return SizedBox(
@@ -487,15 +528,51 @@ class AppleWatchScreen extends StatelessWidget {
                   ),
                   child: Stack(
                     children: [
-                      Center(child: Image.asset(item["image"]!, height: 160)),
+                      Center(child: Image.asset(item["image"] as String, height: 160)),
                       const Positioned(top: 15, right: 15, child: Icon(Icons.bookmark_border, color: Colors.white54)),
+                      Positioned(
+                        bottom: 12,
+                        right: 12,
+                        child: GestureDetector(
+                          onTap: () {
+                            final product = Product(
+                              id: item["id"] as String,
+                              name: item["name"] as String,
+                              description: item["name"] as String,
+                              price: item["priceValue"] as double,
+                              imagePaths: [item["image"] as String],
+                              categoryId: "watch-accessory",
+                            );
+                            Provider.of<CartProvider>(context, listen: false)
+                                .addItem(product);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${product.name} đã được thêm vào giỏ hàng.'),
+                                duration: const Duration(seconds: 2),
+                                backgroundColor: Colors.blueAccent,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.add, color: Colors.black, size: 20),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 15),
-                Text(item["name"]!, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(item["name"] as String, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 5),
-                Text(item["price"]!, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                Text(item["price"] as String, style: const TextStyle(color: Colors.white70, fontSize: 14)),
               ],
             ),
           );

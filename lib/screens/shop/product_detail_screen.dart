@@ -120,7 +120,9 @@ class ProductDetailScreen extends StatelessWidget {
                   SnackBar(
                     content: Text('${product.name} đã được thêm vào giỏ hàng.'),
                     duration: const Duration(seconds: 2),
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.blueAccent,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 );
               },

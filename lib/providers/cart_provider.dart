@@ -46,6 +46,35 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void incrementQuantity(String productId) {
+    if (!_items.containsKey(productId)) return;
+    _items.update(
+      productId,
+      (existingItem) => CartItem(
+        product: existingItem.product,
+        quantity: existingItem.quantity + 1,
+      ),
+    );
+    notifyListeners();
+  }
+
+  void decrementQuantity(String productId) {
+    final item = _items[productId];
+    if (item == null) return;
+    if (item.quantity <= 1) {
+      _items.remove(productId);
+    } else {
+      _items.update(
+        productId,
+        (existingItem) => CartItem(
+          product: existingItem.product,
+          quantity: existingItem.quantity - 1,
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
   void clear() {
     _items.clear();
     notifyListeners();

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/product.dart';
+import '../../providers/cart_provider.dart';
 
 class IphoneScreen extends StatelessWidget {
   const IphoneScreen({super.key});
@@ -46,7 +49,7 @@ class IphoneScreen extends StatelessWidget {
 
           // DANH SÁCH SẢN PHẨM IPHONE (Vuốt ngang)
           SliverToBoxAdapter(
-            child: _iphoneHeroCarousel(),
+            child: _iphoneHeroCarousel(context),
           ),
 
           // BANNER ĐỔI CŨ LẤY MỚI
@@ -264,28 +267,34 @@ class IphoneScreen extends StatelessWidget {
     );
   }
 
-  Widget _iphoneHeroCarousel() {
+  Widget _iphoneHeroCarousel(BuildContext context) {
     final iphones = [
       {
+        "id": "iphone-17-pro",
         "image": "assets/images/iphone17.jpg",
         "colors": [Colors.orange, Colors.blueGrey, Colors.white],
         "name": "iPhone 17 Pro",
         "desc": "Thiết kế sáng tạo cho hiệu năng và thời lượng pin cực đỉnh.",
-        "price": "Từ 34.999.000đ hoặc 1.425.000đ/th. trong 24 tháng"
+        "price": "Từ 34.999.000đ hoặc 1.425.000đ/th. trong 24 tháng",
+        "priceValue": 34999000.0,
       },
       {
+        "id": "iphone-air",
         "image": "assets/images/iphone.jpg",
         "colors": [Colors.white, Colors.black, Colors.grey],
         "name": "iPhone Air",
         "desc": "iPhone mỏng nhất từng có. Với sức mạnh pro bên trong.",
-        "price": "Từ 31.999.000đ hoặc 1.303.000đ/th. trong 24 tháng"
+        "price": "Từ 31.999.000đ hoặc 1.303.000đ/th. trong 24 tháng",
+        "priceValue": 31999000.0,
       },
       {
+        "id": "iphone-17",
         "image": "assets/images/iphone17.jpg",
         "colors": [Colors.purpleAccent, Colors.green, Colors.blue, Colors.white, Colors.black],
         "name": "iPhone 17",
         "desc": "Thú vị hơn hẳn. Bền bỉ hơn hẳn.",
-        "price": "Từ 24.999.000đ hoặc 1.018.000đ/th. trong 24 tháng"
+        "price": "Từ 24.999.000đ hoặc 1.018.000đ/th. trong 24 tháng",
+        "priceValue": 24999000.0,
       }
     ];
 
@@ -358,7 +367,27 @@ class IphoneScreen extends StatelessWidget {
                 Row(
                   children: [
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        final product = Product(
+                          id: phone["id"] as String,
+                          name: phone["name"] as String,
+                          description: phone["desc"] as String,
+                          price: phone["priceValue"] as double,
+                          imagePaths: [phone["image"] as String],
+                          categoryId: "iphone",
+                        );
+                        Provider.of<CartProvider>(context, listen: false)
+                            .addItem(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${product.name} đã được thêm vào giỏ hàng.'),
+                            duration: const Duration(seconds: 2),
+                            backgroundColor: Colors.blueAccent,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
                         foregroundColor: Colors.white,

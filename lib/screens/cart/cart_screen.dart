@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
 
@@ -56,7 +57,7 @@ class CartScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '\$${cartItem.product.price.toStringAsFixed(2)}',
+                              '${NumberFormat("#,###", "vi_VN").format(cartItem.product.price)} ₫',
                               style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 16,
@@ -66,9 +67,32 @@ class CartScreen extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'Số lượng: ${cartItem.quantity}',
-                                  style: const TextStyle(color: Colors.white70),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF1C1C1E),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.remove, color: Colors.white, size: 18),
+                                        onPressed: () {
+                                          cart.decrementQuantity(cartItem.product.id);
+                                        },
+                                      ),
+                                      Text(
+                                        '${cartItem.quantity}',
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.add, color: Colors.white, size: 18),
+                                        onPressed: () {
+                                          cart.incrementQuantity(cartItem.product.id);
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
@@ -107,7 +131,7 @@ class CartScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '\$${cart.totalAmount.toStringAsFixed(2)}',
+                          '${NumberFormat("#,###", "vi_VN").format(cart.totalAmount)} ₫',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,

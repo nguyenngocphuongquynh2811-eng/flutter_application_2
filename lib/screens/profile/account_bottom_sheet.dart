@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
+import 'orders_screen.dart';
+import 'profile_placeholder_screen.dart';
+import 'reservation_screen.dart';
+import 'shipping_address_screen.dart';
 
 class AccountBottomSheet extends StatefulWidget {
   const AccountBottomSheet({super.key});
@@ -151,22 +155,72 @@ class _AccountBottomSheetState extends State<AccountBottomSheet> {
 
                         const SizedBox(height: 30),
 
-                        _section([
-                          "Đặt trước",
-                          "Đơn hàng",
-                          "Thiết Bị",
-                          "Dịch Vụ",
-                          "Mục Đã Lưu",
-                        ]),
+                        _section({
+                          "Đặt trước": () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ReservationScreen(),
+                                ),
+                              ),
+                          "Đơn hàng": () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const OrdersScreen(),
+                                ),
+                              ),
+                          "Thiết Bị": () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ProfilePlaceholderScreen(
+                                    title: "Thiết Bị",
+                                    heading: "Bật tính năng này\ntrong Cài đặt.",
+                                    subtitle:
+                                        "Xem thông tin giới thiệu chi tiết về các thiết bị mà bạn sở hữu và nhận các đề xuất dành riêng cho bạn.",
+                                    linkText: "Bật Thiết Bị và Dịch Vụ",
+                                  ),
+                                ),
+                              ),
+                          "Dịch Vụ": () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ProfilePlaceholderScreen(
+                                    title: "Dịch Vụ",
+                                    heading: "Bật tính năng này\ntrong Cài đặt.",
+                                    subtitle:
+                                        "Xem thông tin giới thiệu chi tiết về các gói đăng ký dịch vụ của bạn và nhận đề xuất dành riêng cho bạn.",
+                                    linkText: "Bật Thiết Bị và Dịch Vụ",
+                                  ),
+                                ),
+                              ),
+                          "Mục Đã Lưu": () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ProfilePlaceholderScreen(
+                                    title: "Mục Đã Lưu",
+                                    icon: Icon(Icons.bookmark_border, color: Colors.white54, size: 48),
+                                    heading: "Lập danh sách. Yêu\ncầu Chuyên Gia xem qua.",
+                                    subtitle:
+                                        "Danh sách cho phép Chuyên Gia dễ dàng xem xét và trao đổi về các lựa chọn của bạn — trực tuyến và tại cửa hàng. Mọi ghi chú đều được lưu, vì vậy bạn có thể tiếp tục từ nơi đã dừng bất cứ lúc nào. Lưu sản phẩm đầu tiên của bạn để bắt đầu.",
+                                    linkText: "Mua phụ kiện và nhiều sản phẩm khác",
+                                  ),
+                                ),
+                              ),
+                        }),
 
                         const SizedBox(height: 24),
 
-                        _section([
-                          "Thanh Toán Chính",
-                          "Vận Chuyển Chính",
-                          "Gửi Phản Hồi",
-                          "Cài Đặt",
-                        ]),
+                        _section({
+                          "Thanh Toán Chính": null,
+                          "Vận Chuyển Chính": () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ShippingAddressScreen(),
+                                  fullscreenDialog: true,
+                                ),
+                              ),
+                          "Gửi Phản Hồi": null,
+                          "Cài Đặt": null,
+                        }),
 
                         const SizedBox(height: 24),
 
@@ -342,7 +396,8 @@ class _AccountBottomSheetState extends State<AccountBottomSheet> {
     );
   }
 
-  Widget _section(List<String> items) {
+  Widget _section(Map<String, VoidCallback?> items) {
+    final entries = items.entries.toList();
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF2C2C2E),
@@ -350,17 +405,18 @@ class _AccountBottomSheetState extends State<AccountBottomSheet> {
       ),
       child: Column(
         children: List.generate(
-          items.length,
+          entries.length,
           (index) => Column(
             children: [
               ListTile(
+                onTap: entries[index].value,
                 title: Text(
-                  items[index],
+                  entries[index].key,
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white38, size: 18),
               ),
-              if (index != items.length - 1)
+              if (index != entries.length - 1)
                 const Divider(color: Colors.white10, height: 1),
             ],
           ),
