@@ -19,7 +19,7 @@ class IphoneScreen extends StatelessWidget {
             expandedHeight: 120,
             floating: false,
             pinned: true,
-            backgroundColor: Colors.black.withOpacity(0.9),
+            backgroundColor: Colors.black.withValues(alpha: 0.9),
             elevation: 0,
             leading: IconButton(
               icon: Container(
