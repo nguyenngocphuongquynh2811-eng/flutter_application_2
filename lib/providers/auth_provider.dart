@@ -265,8 +265,27 @@ class AuthProvider with ChangeNotifier {
       name: (data?['name'] as String?) ?? refreshed.displayName ?? '',
       email: refreshed.email ?? '',
       role: (data?['role'] as String?) ?? 'user',
+      avatarBase64: data?['avatarBase64'] as String?,
     );
     _isEmailVerified = refreshed.emailVerified;
+    notifyListeners();
+  }
+
+  Future<void> updateAvatar(String base64Image) async {
+    final user = _auth.currentUser;
+    if (user == null || _currentUser == null) return;
+
+    await _firestore.collection('users').doc(user.uid).set(
+      {'avatarBase64': base64Image},
+      SetOptions(merge: true),
+    );
+
+    _currentUser = AppUser(
+      name: _currentUser!.name,
+      email: _currentUser!.email,
+      role: _currentUser!.role,
+      avatarBase64: base64Image,
+    );
     notifyListeners();
   }
 

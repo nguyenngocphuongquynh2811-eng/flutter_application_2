@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
@@ -16,6 +19,59 @@ class AccountBottomSheet extends StatefulWidget {
 
 class _AccountBottomSheetState extends State<AccountBottomSheet> {
   bool showSmallTitle = false;
+  bool _isUploadingAvatar = false;
+
+  Future<void> _pickAvatar() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: const Color(0xFF2C2C2E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined, color: Colors.white),
+              title: const Text('Chụp ảnh', style: TextStyle(color: Colors.white)),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined, color: Colors.white),
+              title: const Text('Chọn từ thư viện', style: TextStyle(color: Colors.white)),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null || !mounted) return;
+
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 70,
+    );
+    if (picked == null || !mounted) return;
+
+    setState(() => _isUploadingAvatar = true);
+    try {
+      final bytes = await picked.readAsBytes();
+      final base64Image = base64Encode(bytes);
+      if (!mounted) return;
+      await context.read<AuthProvider>().updateAvatar(base64Image);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Không thể cập nhật ảnh đại diện: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUploadingAvatar = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,9 +176,55 @@ class _AccountBottomSheetState extends State<AccountBottomSheet> {
                           ),
                           child: Row(
                             children: [
-                              const CircleAvatar(
-                                radius: 38,
-                                backgroundImage: AssetImage('assets/images/avatar.jpg'),
+                              GestureDetector(
+                                onTap: _isUploadingAvatar ? null : _pickAvatar,
+                                child: Stack(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 38,
+                                      backgroundImage: user?.avatarBase64 != null
+                                          ? MemoryImage(base64Decode(user!.avatarBase64!))
+                                          : const AssetImage('assets/images/avatar.jpg')
+                                              as ImageProvider,
+                                    ),
+                                    if (_isUploadingAvatar)
+                                      const Positioned.fill(
+                                        child: CircleAvatar(
+                                          radius: 38,
+                                          backgroundColor: Colors.black45,
+                                          child: SizedBox(
+                                            width: 22,
+                                            height: 22,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    else
+                                      Positioned(
+                                        right: 0,
+                                        bottom: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blueAccent,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: const Color(0xFF2C2C2E),
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.white,
+                                            size: 14,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
 
                               const SizedBox(width: 18),

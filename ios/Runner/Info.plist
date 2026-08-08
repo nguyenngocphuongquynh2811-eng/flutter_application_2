@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Cho phép truy cập camera để chụp ảnh đại diện.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cho phép truy cập thư viện ảnh để chọn ảnh đại diện.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
