@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_2/src/product/screen/admin_shop_screen.dart';
+import 'package:flutter_application_2/src/order/screen/admin_order_screen.dart';
+import 'package:flutter_application_2/src/statistics/admin_stats_screen.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
 import 'account_management_page.dart';
-import '../../order/screen/admin_order_screen.dart';
 class NavItem {
   const NavItem({
     required this.label,
@@ -15,8 +16,8 @@ class NavItem {
   });
 
   final String label;
-  final IconData icon;       // icon lúc chưa chọn
-  final IconData activeIcon; // icon lúc đang chọn, đậm hơn
+  final IconData icon;
+  final IconData activeIcon;
   final Widget screen;
 }
 
@@ -38,16 +39,10 @@ class _AdminShellState extends State<AdminShell> {
       screen: AdminShopScreen(),
     ),
     NavItem(
-  label: 'Đơn hàng',
-  icon: Icons.receipt_long_outlined,
-  activeIcon: Icons.receipt_long,
-  screen: AdminOrderScreen(),   // thay _Placeholder('Quản lý đơn hàng')
-),
-    NavItem(
-      label: 'Khuyến mãi',
-      icon: Icons.local_offer_outlined,
-      activeIcon: Icons.local_offer,
-      screen: _Placeholder('Quản lý khuyến mãi'),
+      label: 'Đơn hàng',
+      icon: Icons.receipt_long_outlined,
+      activeIcon: Icons.receipt_long,
+      screen: AdminOrderScreen(),
     ),
     NavItem(
       label: 'Tài khoản',
@@ -59,13 +54,7 @@ class _AdminShellState extends State<AdminShell> {
       label: 'Thống kê',
       icon: Icons.bar_chart_outlined,
       activeIcon: Icons.bar_chart,
-      screen: _Placeholder('Thống kê'),
-    ),
-    NavItem(
-      label: 'Cài đặt',
-      icon: Icons.settings_outlined,
-      activeIcon: Icons.settings,
-      screen: _Placeholder('Cài đặt'),
+      screen: AdminStatsScreen(),
     ),
   ];
 
@@ -82,7 +71,7 @@ class _AdminShellState extends State<AdminShell> {
   }
 }
 
-/// Thanh điều hướng nổi, bo tròn, cuộn ngang — đồng bộ với RootScreen bên khách hàng.
+/// Thanh điều hướng nổi, bo tròn, cuộn ngang.
 class _ScrollableBottomBar extends StatelessWidget {
   const _ScrollableBottomBar({
     required this.items,
@@ -120,7 +109,6 @@ class _ScrollableBottomBar extends StatelessWidget {
               child: Container(
                 height: _pillHeight,
                 decoration: _pillDecoration,
-                // Cắt theo bo góc để nội dung cuộn không tràn ra ngoài viên thuốc.
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(_pillRadius),
                   child: ListView.builder(
@@ -165,10 +153,7 @@ class _ScrollableBottomBar extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(width: 12),
-
-            // Nút tròn tách riêng — giống nút tìm kiếm bên app khách hàng.
             Container(
               width: _pillHeight,
               height: _pillHeight,
@@ -185,20 +170,6 @@ class _ScrollableBottomBar extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Placeholder extends StatelessWidget {
-  const _Placeholder(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(text,
-          style: const TextStyle(fontSize: 16, color: AdminColors.textDim)),
     );
   }
 }
