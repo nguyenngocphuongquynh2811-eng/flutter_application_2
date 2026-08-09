@@ -1,7 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
-/// Hiển thị ảnh sản phẩm dù là asset (assets/...) hay base64 (ảnh tải từ máy).
+/// Trả về ImageProvider đúng loại: asset hay base64 (ảnh tải từ máy).
+/// Dùng cho DecorationImage, Hero, CircleAvatar... nơi cần ImageProvider.
+ImageProvider productImageProvider(String source) {
+  if (source.startsWith('assets/')) {
+    return AssetImage(source);
+  }
+  try {
+    return MemoryImage(base64Decode(source));
+  } catch (_) {
+    return const AssetImage('assets/images/iphone.jpg'); // ảnh dự phòng
+  }
+}
+
+/// Widget hiển thị ảnh sản phẩm dù là asset (assets/...) hay base64 (ảnh tải từ máy).
 class ProductImage extends StatelessWidget {
   final String source;
   final double? width;
@@ -17,21 +30,6 @@ class ProductImage extends StatelessWidget {
   });
 
   bool get _isAsset => source.startsWith('assets/');
-
-  /// ImageProvider tương ứng, dùng cho DecorationImage/CircleAvatar.
-  static ImageProvider provider(String source) {
-    if (source.startsWith('assets/')) {
-      return AssetImage(source);
-    }
-    try {
-      return MemoryImage(base64Decode(source));
-    } catch (_) {
-      return MemoryImage(base64Decode(_transparentPixel));
-    }
-  }
-
-  static const _transparentPixel =
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
   @override
   Widget build(BuildContext context) {

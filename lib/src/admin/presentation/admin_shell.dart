@@ -5,6 +5,7 @@ import 'package:flutter_application_2/src/order/screen/admin_order_screen.dart';
 import 'package:flutter_application_2/src/statistics/admin_stats_screen.dart';
 
 import '../../../providers/auth_provider.dart';
+import '../../../data/product_store.dart';
 import '../../core/theme/admin_theme.dart';
 import 'account_management_page.dart';
 class NavItem {
@@ -57,6 +58,13 @@ class _AdminShellState extends State<AdminShell> {
       screen: AdminStatsScreen(),
     ),
   ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProductStore>().seedIfEmpty();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

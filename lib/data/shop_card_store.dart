@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/shop_card.dart';
 import 'mock_data.dart';
-
+import '../../data/shop_card_store.dart';
 class ShopCardStore extends ChangeNotifier {
   final List<ShopCard> _bigCards = List.of(MockData.bigCards);
   final List<ShopCard> _smallCards = List.of(MockData.smallCards);

@@ -15,6 +15,8 @@ import 'screens/auth/login_screen.dart';
 import 'screens/root_screen.dart';
 import 'src/admin/presentation/admin_shell.dart';
 import 'src/core/theme/admin_theme.dart';
+import 'data/experience_card_store.dart';
+import 'data/category_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +31,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProductStore()),
         ChangeNotifierProvider(create: (_) => BannerStore()),
         ChangeNotifierProvider(create: (_) => ShopCardStore()),
+        ChangeNotifierProvider(create: (_) => ExperienceCardStore()),
+        ChangeNotifierProvider(create: (_) => CategoryStore()),
       ],
       child: const AppleStoreApp(),
     ),
