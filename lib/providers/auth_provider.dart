@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-
+import 'package:intl/intl.dart';
 import '../models/app_user.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -61,40 +61,75 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<String?> login({required String email, required String password}) async {
-    final normalizedEmail = email.trim().toLowerCase();
-    try {
-      final credential = await _auth.signInWithEmailAndPassword(
-        email: normalizedEmail,
-        password: password,
-      );
-      // Self-healing: whoever successfully signs in with the designated admin
-      // email is granted the admin role, even if that account already existed
-      // as a regular user from earlier testing.
-      if (normalizedEmail == _adminEmail) {
-        await _firestore.collection('users').doc(credential.user!.uid).set(
-          {'role': 'admin'},
-          SetOptions(merge: true),
-        );
+Future<String?> login({
+  required String email,
+  required String password,
+}) async {
+  final normalizedEmail = email.trim().toLowerCase();
+
+  try {
+    final credential = await _auth.signInWithEmailAndPassword(
+      email: normalizedEmail,
+      password: password,
+    );
+
+    // Chặn đăng nhập nếu tài khoản đang bị khóa
+    // (bỏ qua tài khoản admin gốc)
+    if (normalizedEmail != _adminEmail) {
+      final doc = await _firestore
+          .collection('users')
+          .doc(credential.user!.uid)
+          .get();
+
+      final locked = doc.data()?['lockedUntil'];
+
+      if (locked is Timestamp &&
+          locked.toDate().isAfter(DateTime.now())) {
+        await _auth.signOut();
+
+        return 'Tài khoản đang bị khóa đến '
+            '${DateFormat('dd/MM/yyyy HH:mm').format(locked.toDate())}.';
       }
-      await _loadUser(credential.user!);
-      return null;
-    } on FirebaseAuthException catch (e) {
-      // Newer Firebase projects have email-enumeration protection enabled,
-      // which reports 'invalid-credential' instead of 'user-not-found' even
-      // when the account simply doesn't exist yet — so the admin account
-      // must be bootstrapped on any of these codes, not just 'user-not-found'.
-      const missingAccountCodes = {'user-not-found', 'invalid-credential', 'wrong-password'};
-      if (missingAccountCodes.contains(e.code) &&
-          normalizedEmail == _adminEmail &&
-          password == _adminPassword) {
-        return _bootstrapAdmin();
-      }
-      return _mapAuthError(e);
-    } catch (e) {
-      return 'Đăng nhập thất bại: $e';
     }
+
+    // Self-healing: whoever successfully signs in with the designated admin
+    // email is granted the admin role, even if that account already existed
+    // as a regular user from earlier testing.
+    if (normalizedEmail == _adminEmail) {
+      await _firestore
+          .collection('users')
+          .doc(credential.user!.uid)
+          .set(
+        {'role': 'admin'},
+        SetOptions(merge: true),
+      );
+    }
+
+    await _loadUser(credential.user!);
+    return null;
+  } on FirebaseAuthException catch (e) {
+    // Newer Firebase projects have email-enumeration protection enabled,
+    // which reports 'invalid-credential' instead of 'user-not-found' even
+    // when the account simply doesn't exist yet — so the admin account
+    // must be bootstrapped on any of these codes, not just 'user-not-found'.
+    const missingAccountCodes = {
+      'user-not-found',
+      'invalid-credential',
+      'wrong-password',
+    };
+
+    if (missingAccountCodes.contains(e.code) &&
+        normalizedEmail == _adminEmail &&
+        password == _adminPassword) {
+      return _bootstrapAdmin();
+    }
+
+    return _mapAuthError(e);
+  } catch (e) {
+    return 'Đăng nhập thất bại: $e';
   }
+}
+
 
   Future<String?> _bootstrapAdmin() async {
     try {
@@ -253,7 +288,29 @@ Future<String?> changeOwnPassword(String newPassword) async {
       return 'Không thể xóa tài khoản: $e';
     }
   }
+/// Khóa tài khoản đến thời điểm [until].
+Future<String?> lockUser(String uid, DateTime until) async {
+  try {
+    await _firestore.collection('users').doc(uid).update({
+      'lockedUntil': Timestamp.fromDate(until),
+    });
+    return null;
+  } catch (e) {
+    return 'Không thể khóa tài khoản: $e';
+  }
+}
 
+/// Mở khóa tài khoản.
+Future<String?> unlockUser(String uid) async {
+  try {
+    await _firestore.collection('users').doc(uid).update({
+      'lockedUntil': FieldValue.delete(),
+    });
+    return null;
+  } catch (e) {
+    return 'Không thể mở khóa: $e';
+  }
+}
   Future<void> resendVerificationEmail() async {
     await _auth.currentUser?.sendEmailVerification();
   }
