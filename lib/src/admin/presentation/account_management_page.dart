@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
@@ -16,6 +15,21 @@ ImageProvider? _avatarProvider(String? base64Image) {
   } catch (_) {
     return null;
   }
+}
+
+/// Số ngày tối đa không đăng nhập trước khi bị auto-khóa (3 tháng).
+const int _inactiveLockDays = 90;
+
+String _lastLoginText(DateTime? last) {
+  if (last == null) return 'Chưa đăng nhập';
+  final diff = DateTime.now().difference(last);
+  if (diff.inSeconds < 5) return 'Vừa đăng nhập';
+  if (diff.inSeconds < 60) return 'Đăng nhập ${diff.inSeconds} giây trước';
+  if (diff.inMinutes < 60) return 'Đăng nhập ${diff.inMinutes} phút trước';
+  if (diff.inHours < 24) return 'Đăng nhập ${diff.inHours} giờ trước';
+  if (diff.inDays < 30) return 'Đăng nhập ${diff.inDays} ngày trước';
+  if (diff.inDays < 365) return 'Đăng nhập ${diff.inDays ~/ 30} tháng trước';
+  return 'Đăng nhập ${diff.inDays ~/ 365} năm trước';
 }
 
 class AccountManagementPage extends StatelessWidget {
@@ -70,11 +84,12 @@ class AccountManagementPage extends StatelessWidget {
               final isAdmin = role == 'admin';
               final isSelf = doc.id == currentUid;
 
-              final lockedTs = data['lockedUntil'];
-              final lockedUntil =
-                  lockedTs is Timestamp ? lockedTs.toDate() : null;
-              final isLocked =
-                  lockedUntil != null && lockedUntil.isAfter(DateTime.now());
+              // Auto-khóa nếu không đăng nhập quá 3 tháng.
+              final lastTs = data['lastLogin'];
+              final lastLogin = lastTs is Timestamp ? lastTs.toDate() : null;
+              final isLocked = lastLogin != null &&
+                  DateTime.now().difference(lastLogin).inDays >
+                      _inactiveLockDays;
 
               return Container(
                 padding: const EdgeInsets.all(14),
@@ -82,7 +97,8 @@ class AccountManagementPage extends StatelessWidget {
                   color: const Color(0xFF1C1C1E),
                   borderRadius: BorderRadius.circular(16),
                   border: isLocked
-                      ? Border.all(color: Colors.orangeAccent.withValues(alpha: 0.4))
+                      ? Border.all(
+                          color: Colors.orangeAccent.withValues(alpha: 0.4))
                       : null,
                 ),
                 child: Row(
@@ -152,10 +168,34 @@ class AccountManagementPage extends StatelessWidget {
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600)),
                               ),
-                              if (isLocked) ...[
-                                const SizedBox(width: 8),
-                                _LockCountdown(lockedUntil),
-                              ],
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (isLocked) ...[
+                                      const Icon(Icons.lock,
+                                          color: Colors.orangeAccent,
+                                          size: 12),
+                                      const SizedBox(width: 3),
+                                    ],
+                                    Flexible(
+                                      child: Text(
+                                        _lastLoginText(lastLogin),
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            color: isLocked
+                                                ? Colors.orangeAccent
+                                                : Colors.white38,
+                                            fontSize: 11,
+                                            fontWeight: isLocked
+                                                ? FontWeight.w600
+                                                : FontWeight.normal),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -164,29 +204,27 @@ class AccountManagementPage extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.edit_outlined,
                           color: Colors.white54, size: 20),
+                      tooltip: 'Sửa',
                       onPressed: () =>
                           _openAccountForm(context, existing: doc),
                     ),
-                    // Khóa / Mở khóa (thay cho nút Xóa cũ)
                     if (isLocked)
                       IconButton(
                         icon: const Icon(Icons.lock_open,
                             color: Colors.greenAccent, size: 20),
                         tooltip: 'Mở khóa',
                         onPressed: () => _unlock(context, doc.id),
-                      )
-                    else
-                      IconButton(
-                        icon: Icon(Icons.lock_outline,
-                            color: isSelf
-                                ? Colors.white24
-                                : Colors.orangeAccent,
-                            size: 20),
-                        tooltip: 'Khóa tài khoản',
-                        onPressed: isSelf
-                            ? null
-                            : () => _openLockDialog(context, doc.id, name),
                       ),
+                    IconButton(
+                      icon: Icon(Icons.delete_outline,
+                          color:
+                              isSelf ? Colors.white24 : Colors.redAccent,
+                          size: 20),
+                      tooltip: 'Xóa tài khoản',
+                      onPressed: isSelf
+                          ? null
+                          : () => _confirmDelete(context, doc.id, name, email),
+                    ),
                   ],
                 ),
               );
@@ -206,89 +244,39 @@ class AccountManagementPage extends StatelessWidget {
     }
   }
 
-  Future<void> _openLockDialog(
-      BuildContext context, String uid, String name) async {
-    final controller = TextEditingController(text: '1');
-    String unit = 'Tháng';
-
-    final until = await showDialog<DateTime>(
+  Future<void> _confirmDelete(
+      BuildContext context, String uid, String name, String email) async {
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setLocal) => AlertDialog(
-          backgroundColor: const Color(0xFF2C2C2E),
-          title: Text('Khóa "${name.isEmpty ? 'tài khoản' : name}"',
-              style: const TextStyle(color: Colors.white)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Chọn thời hạn khóa:',
-                    style: TextStyle(color: Colors.white70)),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: controller,
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        labelText: 'Số',
-                        labelStyle: TextStyle(color: Colors.white54),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white24)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.blueAccent)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  DropdownButton<String>(
-                    value: unit,
-                    dropdownColor: const Color(0xFF3A3A3C),
-                    style: const TextStyle(color: Colors.white),
-                    items: const [
-                      DropdownMenuItem(value: 'Tháng', child: Text('Tháng')),
-                      DropdownMenuItem(value: 'Năm', child: Text('Năm')),
-                    ],
-                    onChanged: (v) => setLocal(() => unit = v!),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Hủy',
-                    style: TextStyle(color: Colors.white70))),
-            TextButton(
-              onPressed: () {
-                final n = int.tryParse(controller.text.trim()) ?? 0;
-                if (n <= 0) return;
-                final now = DateTime.now();
-                final result = unit == 'Năm'
-                    ? DateTime(now.year + n, now.month, now.day, now.hour,
-                        now.minute)
-                    : DateTime(now.year, now.month + n, now.day, now.hour,
-                        now.minute);
-                Navigator.pop(ctx, result);
-              },
-              child: const Text('Khóa',
-                  style: TextStyle(color: Colors.orangeAccent)),
-            ),
-          ],
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF2C2C2E),
+        title: const Text('Xóa tài khoản?',
+            style: TextStyle(color: Colors.white)),
+        content: Text(
+          'Xóa hồ sơ của "${name.isEmpty ? email : name}" khỏi hệ thống.\n\n'
+          'Lưu ý: chỉ xóa hồ sơ/quyền trong ứng dụng. Ứng dụng di động không thể tự xóa hẳn đăng nhập của người khác.',
+          style: const TextStyle(color: Colors.white70),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Hủy', style: TextStyle(color: Colors.white70)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child:
+                const Text('Xóa', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
       ),
     );
 
-    if (until == null || !context.mounted) return;
-    final err = await context.read<AuthProvider>().lockUser(uid, until);
-    if (err != null && context.mounted) {
+    if (confirmed != true || !context.mounted) return;
+
+    final error = await context.read<AuthProvider>().deleteUserProfile(uid);
+    if (error != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(err), backgroundColor: Colors.redAccent),
+        SnackBar(content: Text(error), backgroundColor: Colors.redAccent),
       );
     }
   }
@@ -300,61 +288,6 @@ class AccountManagementPage extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _AccountFormSheet(existing: existing),
-    );
-  }
-}
-
-/// Đếm ngược thời gian còn lại của khóa, tự cập nhật mỗi giây.
-class _LockCountdown extends StatefulWidget {
-  final DateTime until;
-  const _LockCountdown(this.until);
-
-  @override
-  State<_LockCountdown> createState() => _LockCountdownState();
-}
-
-class _LockCountdownState extends State<_LockCountdown> {
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final diff = widget.until.difference(DateTime.now());
-    if (diff.isNegative) {
-      return const Text('Hết hạn khóa',
-          style: TextStyle(color: Colors.white38, fontSize: 11));
-    }
-    final d = diff.inDays;
-    final h = diff.inHours % 24;
-    final m = diff.inMinutes % 60;
-    final s = diff.inSeconds % 60;
-    final hh = h.toString().padLeft(2, '0');
-    final mm = m.toString().padLeft(2, '0');
-    final ss = s.toString().padLeft(2, '0');
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.lock, color: Colors.orangeAccent, size: 12),
-        const SizedBox(width: 3),
-        Text('Còn ${d}n $hh:$mm:$ss',
-            style: const TextStyle(
-                color: Colors.orangeAccent,
-                fontSize: 11,
-                fontWeight: FontWeight.w600)),
-      ],
     );
   }
 }
