@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../screens/profile/account_bottom_sheet.dart';
 import '../../../widgets/profile_avatar.dart';
 import '../../../data/mock_data.dart';
+import '../../../data/shop_card_store.dart';
 import '../../../screens/shop/apple_music_detail_screen.dart';
 import '../../../screens/shop/apple_fitness_detail_screen.dart';
 import '../../../data/cart_data.dart';
@@ -9,6 +11,7 @@ import 'admin_category_screen.dart';
 import 'admin_iphone_screen.dart';
 import 'admin_watch_screen.dart';   // thêm đầu file
 import '../widgets/banner_widget.dart';
+import '../sheet/edit_shop_card_sheet.dart';
 
 class AdminShopScreen extends StatelessWidget {
   const AdminShopScreen({super.key});
@@ -82,7 +85,74 @@ class AdminShopScreen extends StatelessWidget {
             child: _accessories(),
           ),
 
-          _sectionTitle("Khám phá sản phẩm mới"),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(22, 35, 22, 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Khám phá sản phẩm mới",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    color: const Color(0xFF2C2C2E),
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    onSelected: (value) {
+                      final store = context.read<ShopCardStore>();
+                      switch (value) {
+                        case "add":
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => const EditShopCardSheet(),
+                          );
+                          break;
+                        case "manage":
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (_) => EditShopCardSheet(
+                              bigCards: store.bigCards,
+                              smallCards: store.smallCards,
+                              selectedIndex: 0,
+                              isBig: true,
+                            ),
+                          );
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(
+                        value: "add",
+                        child: Row(
+                          children: [
+                            Icon(Icons.add),
+                            SizedBox(width: 10),
+                            Text("Thêm sản phẩm"),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: "manage",
+                        child: Row(
+                          children: [
+                            Icon(Icons.photo_library),
+                            SizedBox(width: 10),
+                            Text("Quản lý"),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
 
           SliverToBoxAdapter(
             child: _newProductsSection(context),
@@ -446,12 +516,27 @@ class AdminShopScreen extends StatelessWidget {
   }
 
   static Widget _newProductsSection(BuildContext context) {
+    final store = context.watch<ShopCardStore>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 22),
       child: Column(
         children: [
-          ...MockData.bigCards.map((product) {
-            return Padding(
+          ...store.bigCards.asMap().entries.map((entry) {
+            final index = entry.key;
+            final product = entry.value;
+            void openEdit() => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => EditShopCardSheet(
+                    bigCards: store.bigCards,
+                    smallCards: store.smallCards,
+                    selectedIndex: index,
+                    isBig: true,
+                  ),
+                );
+            return GestureDetector(
+              onTap: openEdit,
+              child: Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: Container(
                 height: 540,
@@ -539,7 +624,7 @@ class AdminShopScreen extends StatelessWidget {
                                   ],
                                 ),
                                 ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: openEdit,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white,
                                     foregroundColor: Colors.black,
@@ -547,7 +632,7 @@ class AdminShopScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(30),
                                     ),
                                   ),
-                                  child: const Text("Mua"),
+                                  child: const Text("Chỉnh sửa"),
                                 ),
                               ],
                             ),
@@ -558,6 +643,7 @@ class AdminShopScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              ),
             );
           }),
           const SizedBox(height: 10),
@@ -565,10 +651,22 @@ class AdminShopScreen extends StatelessWidget {
             height: 450,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: MockData.smallCards.length,
+              itemCount: store.smallCards.length,
               itemBuilder: (context, index) {
-                final product = MockData.smallCards[index];
-                return Container(
+                final product = store.smallCards[index];
+                void openEdit() => showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) => EditShopCardSheet(
+                        bigCards: store.bigCards,
+                        smallCards: store.smallCards,
+                        selectedIndex: index,
+                        isBig: false,
+                      ),
+                    );
+                return GestureDetector(
+                  onTap: openEdit,
+                  child: Container(
                   width: 330,
                   margin: const EdgeInsets.only(right: 18),
                   decoration: BoxDecoration(
@@ -683,7 +781,7 @@ class AdminShopScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 10),
                                     ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: openEdit,
                                       style: ElevatedButton.styleFrom(
                                         minimumSize: const Size(70, 40),
                                         backgroundColor: Colors.white,
@@ -693,7 +791,7 @@ class AdminShopScreen extends StatelessWidget {
                                         ),
                                       ),
                                       child: const Text(
-                                        "Mua",
+                                        "Chỉnh sửa",
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600),
                                       ),
@@ -706,6 +804,7 @@ class AdminShopScreen extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
                   ),
                 );
               },

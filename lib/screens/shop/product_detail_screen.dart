@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/product.dart';
 import '../../providers/cart_provider.dart';
 import 'package:intl/intl.dart';
+import '../../widgets/product_image.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -23,7 +24,7 @@ class ProductDetailScreen extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
                 tag: 'product-${product.id}',
-                child: Image.asset(
+                child: ProductImage(
                   product.imagePaths[0],
                   fit: BoxFit.cover,
                 ),
@@ -84,7 +85,7 @@ class ProductDetailScreen extends StatelessWidget {
                             margin: const EdgeInsets.only(right: 16),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
-                              child: Image.asset(
+                              child: ProductImage(
                                 product.imagePaths[index],
                                 fit: BoxFit.cover,
                               ),

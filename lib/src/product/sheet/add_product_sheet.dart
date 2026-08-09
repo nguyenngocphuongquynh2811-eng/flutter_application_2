@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../widgets/product_image.dart';
 import '../../../data/mock_data.dart';
 import '../../../data/product_store.dart';
 import '../../../models/product.dart';
@@ -67,6 +70,41 @@ class _AddProductSheetState extends State<AddProductSheet> {
     );
   }
 
+  Future<void> _pickFromDevice() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Chọn từ thư viện'),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Chụp ảnh mới'),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      imageQuality: 50,
+      maxWidth: 1000,
+    );
+    if (picked == null) return;
+
+    final bytes = await picked.readAsBytes();
+    final base64Image = base64Encode(bytes);
+    setState(() => pickedImages.add(base64Image));
+  }
+
   void _save() {
     final name = nameController.text.trim();
     final price =
@@ -121,10 +159,21 @@ class _AddProductSheetState extends State<AddProductSheet> {
               const SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  onPressed: _pickImage,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Thêm ảnh'),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: const Text('Chọn ảnh có sẵn'),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      onPressed: _pickFromDevice,
+                      icon: const Icon(Icons.camera_alt_outlined),
+                      label: const Text('Tải ảnh từ máy'),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 10),
@@ -136,7 +185,7 @@ class _AddProductSheetState extends State<AddProductSheet> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(path,
+                        child: ProductImage(path,
                             width: 90, height: 90, fit: BoxFit.cover),
                       ),
                       Positioned(

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../widgets/auth_text_field.dart';
+import '../../widgets/product_image.dart';
 
 const double _freeShippingThreshold = 5000000;
 const double _shippingFee = 30000;
@@ -229,7 +230,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     children: [
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
-                                        child: Image.asset(
+                                        child: ProductImage(
                                           cartItem.product.imagePaths.isNotEmpty
                                               ? cartItem.product.imagePaths[0]
                                               : 'assets/images/iphone.jpg',

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../data/product_store.dart';
 import '../../../models/product.dart';
+import '../../../widgets/product_image.dart';
 import '../../product/admin_product_view_page.dart';
 import '../../product/sheet/add_product_sheet.dart';
 
@@ -327,7 +328,7 @@ class AdminWatchScreen extends StatelessWidget {
                       color: const Color(0xFFF5F5F7),
                       borderRadius: BorderRadius.circular(32),
                       image: DecorationImage(
-                        image: AssetImage(watch.imagePaths.first),
+                        image: ProductImage.provider(watch.imagePaths.first),
                         fit: BoxFit.cover,
                       ),
                     ),

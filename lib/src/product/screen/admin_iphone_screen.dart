@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
+import '../sheet/edit_product_sheet.dart';
 import '../../../data/product_store.dart';
 import '../../../models/product.dart';
+import '../../../widgets/product_image.dart';
 import '../../product/admin_product_view_page.dart';
 import '../../product/sheet/add_product_sheet.dart';
 
@@ -14,17 +16,7 @@ class AdminIphoneScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blueAccent,
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (_) => const AddProductSheet(categoryId: 'c2'),
-          );
-        },
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics()),
@@ -35,6 +27,26 @@ class AdminIphoneScreen extends StatelessWidget {
             pinned: true,
             backgroundColor: Colors.black.withValues(alpha: 0.9),
             elevation: 0,
+            actions: [
+  IconButton(
+    onPressed: () {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => const AddProductSheet(categoryId: 'c2'),
+      );
+    },
+    icon: Container(
+      padding: const EdgeInsets.all(8),
+      decoration: const BoxDecoration(
+        color: Color(0xFF1C1C1E),
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.add, size: 20, color: Colors.white),
+    ),
+  ),
+  const SizedBox(width: 12),
+],
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(8),
@@ -301,12 +313,11 @@ class AdminIphoneScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AdminProductViewPage(
-                          product: phone, allProducts: phones),
-                    ),
+                  onTap: () => showModalBottomSheet(
+                    context:context,
+                    isScrollControlled: true,
+                    builder: (_) => AdminProductViewPage(
+                        product: phone, allProducts: phones),
                   ),
                   child: Container(
                     height: 360,
@@ -314,7 +325,7 @@ class AdminIphoneScreen extends StatelessWidget {
                       color: const Color(0xFF1C1C1E),
                       borderRadius: BorderRadius.circular(32),
                       image: DecorationImage(
-                        image: AssetImage(phone.imagePaths.first),
+                        image: ProductImage.provider(phone.imagePaths.first),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -351,12 +362,11 @@ class AdminIphoneScreen extends StatelessWidget {
                 Row(
                   children: [
                     ElevatedButton.icon(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => AdminProductViewPage(
-                              product: phone, allProducts: phones),
-                        ),
+                      onPressed: () => showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) => AdminProductViewPage(
+                            product: phone, allProducts: phones),
                       ),
                       icon: const Icon(Icons.edit, size: 18),
                       style: ElevatedButton.styleFrom(
