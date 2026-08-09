@@ -8,6 +8,7 @@ import '../../../models/category.dart';
 import '../../../data/shop_card_store.dart';
 import '../../../data/experience_card_store.dart';
 import 'admin_category_screen.dart';
+import '../../../screens/shop/category_page.dart';
 import 'admin_iphone_screen.dart';
 import 'admin_watch_screen.dart';
 import '../widgets/banner_widget.dart';
@@ -234,6 +235,31 @@ class AdminShopScreen extends StatelessWidget {
               } else if (items[index].$3 == 'c4') {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const AdminWatchScreen()));
+              } else if (items[index].$3 == 'c1') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CategoryPage(
+                      categoryId: 'c1',
+                      title: 'Mac',
+                      heroImage: 'assets/images/mac.jpg',
+                      accessoryCategoryId: 'accessory-mac',
+                      isAdmin: true,
+                    ),
+                  ),
+                );
+              } else if (items[index].$3 == 'c3') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CategoryPage(
+                      categoryId: 'c3',
+                      title: 'iPad',
+                      heroImage: 'assets/images/ipad.jpg',
+                      isAdmin: true,
+                    ),
+                  ),
+                );
               } else {
                 final categoryId = items[index].$3;
                 final cat = categoryId.startsWith('accessory-')

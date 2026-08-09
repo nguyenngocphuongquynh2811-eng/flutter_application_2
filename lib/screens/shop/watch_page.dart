@@ -9,6 +9,7 @@ import 'package:flutter_application_2/widgets/product_image.dart';
 import 'package:flutter_application_2/src/product/sheet/add_product_sheet.dart';
 import 'package:flutter_application_2/src/product/sheet/edit_product_sheet.dart';
 import 'product_detail_screen.dart';
+import '../../widgets/persistent_bottom_nav.dart';
 
 /// Trang Apple Watch DÙNG CHUNG cho khách và admin.
 /// isAdmin = true: có nút + (thêm), bấm sản phẩm để sửa, nút xóa.
@@ -64,7 +65,7 @@ class WatchPage extends StatelessWidget {
               title: Text("Apple Watch",
                   style: TextStyle(
                       color: Colors.white,
-                      fontSize: 28,
+                      fontSize: 22,
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.5)),
             ),
@@ -194,6 +195,7 @@ class WatchPage extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: isAdmin ? null : const PersistentBottomNav(),
     );
   }
 

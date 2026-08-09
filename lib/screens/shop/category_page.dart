@@ -11,13 +11,27 @@ import 'package:flutter_application_2/src/product/sheet/edit_product_sheet.dart'
 import 'product_detail_screen.dart';
 import '../../widgets/persistent_bottom_nav.dart';
 
-/// Trang iPhone DÙNG CHUNG cho khách và admin.
-/// - isAdmin = false: khách xem, nút "Mua".
-/// - isAdmin = true: admin, có nút + (thêm), bấm sản phẩm để sửa, nút xóa.
-/// Cả hai đọc chung ProductStore nên giao diện giống hệt và tự đồng bộ.
-class IphonePage extends StatelessWidget {
+/// Trang danh mục DÙNG CHUNG cho khách và admin — cùng bố cục với
+/// IphonePage/WatchPage (hero carousel, banner đổi cũ lấy mới, phụ kiện...)
+/// để mọi danh mục (Mac, iPad...) đồng bộ giao diện với iPhone/Apple Watch.
+class CategoryPage extends StatelessWidget {
+  final String categoryId;
+  final String title;
+  final String heroImage;
+
+  /// categoryId của phụ kiện liên quan (VD: 'accessory-mac'). Để trống thì
+  /// ẩn hẳn mục "Tìm mảnh ghép hoàn hảo" vì chưa có dữ liệu phụ kiện thật.
+  final String? accessoryCategoryId;
   final bool isAdmin;
-  const IphonePage({super.key, this.isAdmin = false});
+
+  const CategoryPage({
+    super.key,
+    required this.categoryId,
+    required this.title,
+    required this.heroImage,
+    this.accessoryCategoryId,
+    this.isAdmin = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +61,7 @@ class IphonePage extends StatelessWidget {
                       onPressed: () => showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (_) => const AddProductSheet(categoryId: 'c2'),
+                        builder: (_) => AddProductSheet(categoryId: categoryId),
                       ),
                       icon: Container(
                         padding: const EdgeInsets.all(8),
@@ -60,10 +74,10 @@ class IphonePage extends StatelessWidget {
                     const SizedBox(width: 12),
                   ]
                 : null,
-            flexibleSpace: const FlexibleSpaceBar(
-              titlePadding: EdgeInsets.only(left: 24, bottom: 16),
-              title: Text("iPhone",
-                  style: TextStyle(
+            flexibleSpace: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
+              title: Text(title,
+                  style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -115,23 +129,23 @@ class IphonePage extends StatelessWidget {
                     ClipRRect(
                       borderRadius: const BorderRadius.horizontal(
                           left: Radius.circular(24)),
-                      child: Image.asset("assets/images/iphone16.jpg",
+                      child: ProductImage(heroImage,
                           width: 120, height: 120, fit: BoxFit.cover),
                     ),
-                    const Expanded(
+                    Expanded(
                       child: Padding(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("So sánh tất cả các\nphiên bản",
+                            const Text("So sánh tất cả các\nphiên bản",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold)),
-                            SizedBox(height: 8),
-                            Text("Xem iPhone nào phù hợp với bạn.",
-                                style: TextStyle(
+                            const SizedBox(height: 8),
+                            Text("Xem $title nào phù hợp với bạn.",
+                                style: const TextStyle(
                                     color: Colors.white54, fontSize: 14)),
                           ],
                         ),
@@ -143,7 +157,7 @@ class IphonePage extends StatelessWidget {
             ),
           ),
 
-          _sectionTitle("Xem cập nhật mới về iPhone"),
+          _sectionTitle("Xem cập nhật mới về $title"),
           SliverToBoxAdapter(child: _featureCarousel()),
 
           _sectionTitle("Dễ dàng thiết lập"),
@@ -172,41 +186,10 @@ class IphonePage extends StatelessWidget {
             ),
           ),
 
-          _sectionTitle("Tìm mảnh ghép hoàn hảo\nvới bạn >"),
-          SliverToBoxAdapter(child: _accessoriesCarousel()),
-
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24),
-                    child: Text("Duyệt xem tất cả phụ kiện\nthiết yếu",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    height: 50,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        _pillButton("Tất Cả Phụ Kiện Máy iPhone"),
-                        _pillButton("Ốp Lưng & Vỏ Bảo Vệ"),
-                        _pillButton("MagSafe"),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          if (accessoryCategoryId != null) ...[
+            _sectionTitle("Tìm mảnh ghép hoàn hảo\nvới bạn >"),
+            SliverToBoxAdapter(child: _accessoriesCarousel(context)),
+          ],
 
           SliverToBoxAdapter(
             child: Padding(
@@ -263,31 +246,16 @@ class IphonePage extends StatelessWidget {
     );
   }
 
-  Widget _pillButton(String text) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1E),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Center(
-        child: Text(text,
-            style: const TextStyle(color: Colors.white, fontSize: 15)),
-      ),
-    );
-  }
-
   // ===== HERO SẢN PHẨM (đọc ProductStore, sửa được khi isAdmin) =====
   Widget _heroCarousel(BuildContext context) {
-    final phones = context.watch<ProductStore>().byCategory('c2');
+    final products = context.watch<ProductStore>().byCategory(categoryId);
 
-    if (phones.isEmpty) {
+    if (products.isEmpty) {
       return SizedBox(
         height: 200,
         child: Center(
           child: Text(
-              isAdmin ? 'Chưa có iPhone nào. Bấm + để thêm.' : 'Chưa có iPhone nào.',
+              isAdmin ? 'Chưa có $title nào. Bấm + để thêm.' : 'Chưa có $title nào.',
               style: const TextStyle(color: Colors.white54, fontSize: 16)),
         ),
       );
@@ -301,9 +269,9 @@ class IphonePage extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        itemCount: phones.length,
+        itemCount: products.length,
         itemBuilder: (context, index) {
-          final Product phone = phones[index];
+          final Product product = products[index];
 
           return Container(
             width: 340,
@@ -317,7 +285,7 @@ class IphonePage extends StatelessWidget {
                             context: context,
                             isScrollControlled: true,
                             builder: (_) => EditProductSheet(
-                                product: phone, allProducts: phones),
+                                product: product, allProducts: products),
                           )
                       : null,
                   child: Container(
@@ -326,7 +294,7 @@ class IphonePage extends StatelessWidget {
                       color: const Color(0xFF1C1C1E),
                       borderRadius: BorderRadius.circular(32),
                       image: DecorationImage(
-                        image: productImageProvider(phone.imagePaths.first),
+                        image: productImageProvider(product.imagePaths.first),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -349,14 +317,14 @@ class IphonePage extends StatelessWidget {
                       .toList(),
                 ),
                 const SizedBox(height: 15),
-                if (phone.tag.isNotEmpty)
-                  Text(phone.tag,
+                if (product.tag.isNotEmpty)
+                  Text(product.tag,
                       style: const TextStyle(
                           color: Colors.orange,
                           fontSize: 13,
                           fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
-                Text(phone.name,
+                Text(product.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -364,14 +332,14 @@ class IphonePage extends StatelessWidget {
                         fontSize: 24,
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text(phone.description,
+                Text(product.description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                         color: Colors.white70, fontSize: 15, height: 1.4)),
                 const SizedBox(height: 12),
                 Text(
-                  'Từ ${NumberFormat("#,###", "vi_VN").format(phone.price)}đ',
+                  'Từ ${NumberFormat("#,###", "vi_VN").format(product.price)}đ',
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -379,8 +347,8 @@ class IphonePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
                 isAdmin
-                    ? _adminButtons(context, phone, phones)
-                    : _customerButtons(context, phone),
+                    ? _adminButtons(context, product, products)
+                    : _customerButtons(context, product),
               ],
             ),
           );
@@ -389,15 +357,15 @@ class IphonePage extends StatelessWidget {
     );
   }
 
-  Widget _customerButtons(BuildContext context, Product phone) {
+  Widget _customerButtons(BuildContext context, Product product) {
     return Row(
       children: [
         ElevatedButton(
           onPressed: () {
-            Provider.of<CartProvider>(context, listen: false).addItem(phone);
+            Provider.of<CartProvider>(context, listen: false).addItem(product);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('${phone.name} đã được thêm vào giỏ hàng.'),
+                content: Text('${product.name} đã được thêm vào giỏ hàng.'),
                 duration: const Duration(seconds: 2),
                 backgroundColor: Colors.blueAccent,
                 behavior: SnackBarBehavior.floating,
@@ -423,7 +391,7 @@ class IphonePage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ProductDetailScreen(product: phone),
+                builder: (_) => ProductDetailScreen(product: product),
               ),
             );
           },
@@ -443,7 +411,7 @@ class IphonePage extends StatelessWidget {
   }
 
   Widget _adminButtons(
-      BuildContext context, Product phone, List<Product> phones) {
+      BuildContext context, Product product, List<Product> products) {
     return Row(
       children: [
         ElevatedButton.icon(
@@ -451,7 +419,7 @@ class IphonePage extends StatelessWidget {
             context: context,
             isScrollControlled: true,
             builder: (_) =>
-                EditProductSheet(product: phone, allProducts: phones),
+                EditProductSheet(product: product, allProducts: products),
           ),
           icon: const Icon(Icons.edit, size: 18),
           style: ElevatedButton.styleFrom(
@@ -474,7 +442,7 @@ class IphonePage extends StatelessWidget {
                 backgroundColor: const Color(0xFF1C1C1E),
                 title: const Text('Xoá sản phẩm?',
                     style: TextStyle(color: Colors.white)),
-                content: Text('Xoá "${phone.name}"?',
+                content: Text('Xoá "${product.name}"?',
                     style: const TextStyle(color: Colors.white70)),
                 actions: [
                   TextButton(
@@ -488,7 +456,7 @@ class IphonePage extends StatelessWidget {
               ),
             );
             if (ok == true && context.mounted) {
-              context.read<ProductStore>().deleteProduct(phone.id);
+              context.read<ProductStore>().deleteProduct(product.id);
             }
           },
           icon: const Icon(Icons.delete_outline, size: 18),
@@ -552,11 +520,11 @@ class IphonePage extends StatelessWidget {
               children: [
                 Expanded(
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(28)),
+                          const BorderRadius.vertical(top: Radius.circular(28)),
                       image: DecorationImage(
-                        image: AssetImage("assets/images/iphone.jpg"),
+                        image: productImageProvider(heroImage),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -588,19 +556,11 @@ class IphonePage extends StatelessWidget {
     );
   }
 
-  Widget _accessoriesCarousel() {
-    final accessories = [
-      {
-        "image": "assets/images/iphone.jpg",
-        "name": "Ốp Lưng Silicon MagSafe cho iPhone 17 Pro - Kem Vani",
-        "price": "1.403.000đ"
-      },
-      {
-        "image": "assets/images/iphone.jpg",
-        "name": "Dây Đeo Chéo - Hồng Phai",
-        "price": "1.668.000đ"
-      },
-    ];
+  Widget _accessoriesCarousel(BuildContext context) {
+    final accessories =
+        context.watch<ProductStore>().byCategory(accessoryCategoryId!);
+
+    if (accessories.isEmpty) return const SizedBox.shrink();
 
     return SizedBox(
       height: 380,
@@ -611,48 +571,44 @@ class IphonePage extends StatelessWidget {
         itemCount: accessories.length,
         itemBuilder: (context, index) {
           final item = accessories[index];
-          return Container(
-            width: 220,
-            margin: const EdgeInsets.only(right: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 220,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1C1C1E),
-                    borderRadius: BorderRadius.circular(24),
+          return GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProductDetailScreen(product: item),
+              ),
+            ),
+            child: Container(
+              width: 220,
+              margin: const EdgeInsets.only(right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 220,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1C1C1E),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Center(
+                      child: ProductImage(item.imagePaths.first, height: 160),
+                    ),
                   ),
-                  child: Stack(
-                    children: [
-                      Center(
-                          child: Image.asset(item["image"]!, height: 160)),
-                      const Positioned(
-                          top: 15,
-                          right: 15,
-                          child: Icon(Icons.bookmark_border,
-                              color: Colors.white54)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-                const Text("Mới",
-                    style: TextStyle(
-                        color: Colors.deepOrange,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold)),
-                const SizedBox(height: 5),
-                Text(item["name"]!,
-                    maxLines: 2,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600)),
-                const SizedBox(height: 5),
-                Text(item["price"]!,
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 14)),
-              ],
+                  const SizedBox(height: 15),
+                  Text(item.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 5),
+                  Text(
+                      '${NumberFormat("#,###", "vi_VN").format(item.price)}đ',
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 14)),
+                ],
+              ),
             ),
           );
         },

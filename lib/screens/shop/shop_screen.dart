@@ -12,8 +12,9 @@ import '../../data/experience_card_store.dart';
 import 'package:flutter_application_2/widgets/product_image.dart';
 import 'accessory_list_screen.dart';
 import 'category_detail_screen.dart';
-import 'iphone_screen.dart';
-import 'apple_watch_screen.dart';
+import 'category_page.dart';
+import 'iphone_page.dart';
+import 'watch_page.dart';
 
 double _parseVndPrice(String price) {
   final digits = price.replaceAll(RegExp(r'[^0-9]'), '');
@@ -192,10 +193,33 @@ class ShopScreen extends StatelessWidget {
             onTap: () {
               if (cat.id == 'c2') {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const IphoneScreen()));
+                    MaterialPageRoute(builder: (_) => const IphonePage()));
               } else if (cat.id == 'c4') {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const AppleWatchScreen()));
+                    MaterialPageRoute(builder: (_) => const WatchPage()));
+              } else if (cat.id == 'c1') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CategoryPage(
+                      categoryId: 'c1',
+                      title: 'Mac',
+                      heroImage: 'assets/images/mac.jpg',
+                      accessoryCategoryId: 'accessory-mac',
+                    ),
+                  ),
+                );
+              } else if (cat.id == 'c3') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CategoryPage(
+                      categoryId: 'c3',
+                      title: 'iPad',
+                      heroImage: 'assets/images/ipad.jpg',
+                    ),
+                  ),
+                );
               } else {
                 Navigator.push(
                   context,

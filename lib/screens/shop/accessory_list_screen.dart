@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/product_store.dart';
+import '../../widgets/persistent_bottom_nav.dart';
 import '../../widgets/product_card.dart';
 
 class AccessoryListScreen extends StatelessWidget {
@@ -58,6 +59,7 @@ class AccessoryListScreen extends StatelessWidget {
                 );
               },
             ),
+      bottomNavigationBar: const PersistentBottomNav(),
     );
   }
 }
