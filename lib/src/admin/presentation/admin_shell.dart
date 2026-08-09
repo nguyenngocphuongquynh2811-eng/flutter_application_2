@@ -5,7 +5,7 @@ import 'package:flutter_application_2/src/product/screen/admin_shop_screen.dart'
 import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
 import 'account_management_page.dart';
-
+import '../../order/screen/admin_order_screen.dart';
 class NavItem {
   const NavItem({
     required this.label,
@@ -38,11 +38,11 @@ class _AdminShellState extends State<AdminShell> {
       screen: AdminShopScreen(),
     ),
     NavItem(
-      label: 'Đơn hàng',
-      icon: Icons.receipt_long_outlined,
-      activeIcon: Icons.receipt_long,
-      screen: _Placeholder('Quản lý đơn hàng'),
-    ),
+  label: 'Đơn hàng',
+  icon: Icons.receipt_long_outlined,
+  activeIcon: Icons.receipt_long,
+  screen: AdminOrderScreen(),   // thay _Placeholder('Quản lý đơn hàng')
+),
     NavItem(
       label: 'Khuyến mãi',
       icon: Icons.local_offer_outlined,
