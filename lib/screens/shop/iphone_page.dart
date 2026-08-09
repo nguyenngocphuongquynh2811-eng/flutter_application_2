@@ -8,6 +8,7 @@ import '../../providers/cart_provider.dart';
 import 'package:flutter_application_2/widgets/product_image.dart';
 import 'package:flutter_application_2/src/product/sheet/add_product_sheet.dart';
 import 'package:flutter_application_2/src/product/sheet/edit_product_sheet.dart';
+import 'product_detail_screen.dart';
 
 /// Trang iPhone DÙNG CHUNG cho khách và admin.
 /// - isAdmin = false: khách xem, nút "Mua".
@@ -354,6 +355,8 @@ class IphonePage extends StatelessWidget {
                           fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
                 Text(phone.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -414,7 +417,14 @@ class IphonePage extends StatelessWidget {
         ),
         const SizedBox(width: 15),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProductDetailScreen(product: phone),
+              ),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1C1C1E),
             foregroundColor: Colors.white,

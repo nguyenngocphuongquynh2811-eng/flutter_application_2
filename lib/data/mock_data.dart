@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 
 class MockData {
   static const List<Category> categories = [
-    Category(id: 'c1', name: 'Mac', imagePath: 'assets/images/mac_cat.jpg'),
-    Category(id: 'c2', name: 'iPhone', imagePath: 'assets/images/Iphone15.jpg'),
-    Category(id: 'c3', name: 'iPad', imagePath: 'assets/images/ipad_cat.jpg'),
-    Category(id: 'c4', name: 'Watch', imagePath: 'assets/images/watch_cat.jpg'),
-    Category(id: 'c5', name: 'AirPods', imagePath: 'assets/images/airpods_cat.jpg'),
+    Category(id: 'c1', name: 'Mac', imagePath: 'assets/images/mac.jpg'),
+    Category(id: 'c2', name: 'iPhone', imagePath: 'assets/images/iphone.jpg'),
+    Category(id: 'c3', name: 'iPad', imagePath: 'assets/images/ipad.jpg'),
+    Category(id: 'c4', name: 'Apple Watch', imagePath: 'assets/images/watch.jpg'),
+    Category(id: 'c5', name: 'AirPods', imagePath: 'assets/images/airpods.jpg'),
   ];
 
   static const List<Product> featuredProducts = [

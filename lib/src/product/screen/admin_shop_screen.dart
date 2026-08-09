@@ -522,25 +522,28 @@ class AdminShopScreen extends StatelessWidget {
                                       fontWeight: FontWeight.w500)),
                               const SizedBox(height: 18),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(product.price,
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600)),
-                                      if (product.priceNote != null)
-                                        Text(product.priceNote!,
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(product.price,
                                             style: const TextStyle(
-                                                color: Colors.white60,
-                                                fontSize: 13)),
-                                    ],
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600)),
+                                        if (product.priceNote != null)
+                                          Text(product.priceNote!,
+                                              style: const TextStyle(
+                                                  color: Colors.white60,
+                                                  fontSize: 13)),
+                                      ],
+                                    ),
                                   ),
+                                  const SizedBox(width: 12),
                                   ElevatedButton(
                                     onPressed: openEdit,
                                     style: ElevatedButton.styleFrom(

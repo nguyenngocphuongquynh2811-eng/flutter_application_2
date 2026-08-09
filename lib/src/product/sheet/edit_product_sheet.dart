@@ -36,6 +36,8 @@ class _EditProductSheetState extends State<EditProductSheet> {
 
   late List<String> allImages;
 
+  bool _isSaving = false;
+
   @override
   void initState() {
     super.initState();
@@ -129,8 +131,9 @@ class _EditProductSheetState extends State<EditProductSheet> {
 
     final picked = await ImagePicker().pickImage(
       source: source,
-      imageQuality: 50,
-      maxWidth: 1000,
+      imageQuality: 40,
+      maxWidth: 800,
+      maxHeight: 800,
     );
     if (picked == null) return;
 
@@ -175,24 +178,26 @@ class _EditProductSheetState extends State<EditProductSheet> {
 
               const SizedBox(height: 10),
 
-              Align(
-                alignment: Alignment.centerRight,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ElevatedButton.icon(
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
                       onPressed: _pickSampleImage,
                       icon: const Icon(Icons.photo_library_outlined),
-                      label: const Text("Chọn ảnh có sẵn"),
+                      label: const Text("Chọn ảnh có sẵn",
+                          overflow: TextOverflow.ellipsis),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton.icon(
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
                       onPressed: _pickFromDevice,
                       icon: const Icon(Icons.camera_alt_outlined),
-                      label: const Text("Tải ảnh từ máy"),
+                      label: const Text("Tải ảnh từ máy",
+                          overflow: TextOverflow.ellipsis),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 15),
@@ -394,29 +399,55 @@ class _EditProductSheetState extends State<EditProductSheet> {
                     backgroundColor: Colors.orange,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  onPressed: () {
-                    final updated = widget.product.copyWith(
-                      name: nameController.text.trim(),
-                      price: double.tryParse(priceController.text.replaceAll(".", "")) ?? widget.product.price,
-                      description: descController.text,
-                      imagePaths: editedImages,
-                    );
+                  onPressed: _isSaving
+                      ? null
+                      : () async {
+                          final updated = widget.product.copyWith(
+                            name: nameController.text.trim(),
+                            price: double.tryParse(
+                                    priceController.text.replaceAll(".", "")) ??
+                                widget.product.price,
+                            description: descController.text,
+                            imagePaths: editedImages,
+                          );
 
-                    context
-                        .read<ProductStore>()
-                        .updateProduct(widget.product.id, updated);
-
-                    Navigator.pop(context); // đóng sheet
-
-                    Navigator.pop(context); // quay về danh sách
-                  },
-                  child: const Text(
-                    "Lưu",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
+                          setState(() => _isSaving = true);
+                          try {
+                            await context
+                                .read<ProductStore>()
+                                .updateProduct(widget.product.id, updated);
+                            if (!context.mounted) return;
+                            Navigator.pop(context); // đóng sheet
+                            Navigator.pop(context); // quay về danh sách
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            setState(() => _isSaving = false);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  e.toString().contains('longer than')
+                                      ? 'Ảnh quá nặng (vượt giới hạn Firestore). Hãy chọn ít ảnh hơn hoặc ảnh nhẹ hơn.'
+                                      : 'Không thể lưu sản phẩm: $e',
+                                ),
+                                backgroundColor: Colors.redAccent,
+                              ),
+                            );
+                          }
+                        },
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text(
+                          "Lưu",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
                 ),
               ),
             ],

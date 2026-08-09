@@ -22,6 +22,7 @@ class _AddProductSheetState extends State<AddProductSheet> {
   final descController = TextEditingController();
   final List<String> pickedImages = [];
   late final List<String> allImages;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -95,8 +96,9 @@ class _AddProductSheetState extends State<AddProductSheet> {
 
     final picked = await ImagePicker().pickImage(
       source: source,
-      imageQuality: 50,
-      maxWidth: 1000,
+      imageQuality: 40,
+      maxWidth: 800,
+      maxHeight: 800,
     );
     if (picked == null) return;
 
@@ -105,7 +107,7 @@ class _AddProductSheetState extends State<AddProductSheet> {
     setState(() => pickedImages.add(base64Image));
   }
 
-  void _save() {
+  Future<void> _save() async {
     final name = nameController.text.trim();
     final price =
         double.tryParse(priceController.text.replaceAll('.', '')) ?? 0;
@@ -128,8 +130,25 @@ class _AddProductSheetState extends State<AddProductSheet> {
       tag: '',
     );
 
-    context.read<ProductStore>().addProduct(newProduct);
-    Navigator.pop(context);
+    setState(() => _isSaving = true);
+    try {
+      await context.read<ProductStore>().addProduct(newProduct);
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString().contains('longer than')
+                ? 'Ảnh quá nặng (vượt giới hạn Firestore). Hãy chọn ít ảnh hơn hoặc ảnh nhẹ hơn.'
+                : 'Không thể lưu sản phẩm: $e',
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
   }
 
   @override
@@ -157,24 +176,26 @@ class _AddProductSheetState extends State<AddProductSheet> {
               const Text('Ảnh sản phẩm',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ElevatedButton.icon(
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
                       onPressed: _pickImage,
                       icon: const Icon(Icons.photo_library_outlined),
-                      label: const Text('Chọn ảnh có sẵn'),
+                      label: const Text('Chọn ảnh có sẵn',
+                          overflow: TextOverflow.ellipsis),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton.icon(
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
                       onPressed: _pickFromDevice,
                       icon: const Icon(Icons.camera_alt_outlined),
-                      label: const Text('Tải ảnh từ máy'),
+                      label: const Text('Tải ảnh từ máy',
+                          overflow: TextOverflow.ellipsis),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               Wrap(
@@ -253,10 +274,17 @@ class _AddProductSheetState extends State<AddProductSheet> {
                     backgroundColor: Colors.orange,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
-                  onPressed: _save,
-                  child: const Text('Lưu',
-                      style:
-                          TextStyle(color: Colors.white, fontSize: 18)),
+                  onPressed: _isSaving ? null : _save,
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Lưu',
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 18)),
                 ),
               ),
             ],

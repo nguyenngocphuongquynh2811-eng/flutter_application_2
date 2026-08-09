@@ -8,6 +8,7 @@ import '../../providers/cart_provider.dart';
 import 'package:flutter_application_2/widgets/product_image.dart';
 import 'package:flutter_application_2/src/product/sheet/add_product_sheet.dart';
 import 'package:flutter_application_2/src/product/sheet/edit_product_sheet.dart';
+import 'product_detail_screen.dart';
 
 /// Trang Apple Watch DÙNG CHUNG cho khách và admin.
 /// isAdmin = true: có nút + (thêm), bấm sản phẩm để sửa, nút xóa.
@@ -345,6 +346,8 @@ class WatchPage extends StatelessWidget {
                           fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
                 Text(watch.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                         color: Colors.white,
                         fontSize: 26,
@@ -405,7 +408,14 @@ class WatchPage extends StatelessWidget {
         ),
         const SizedBox(width: 15),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProductDetailScreen(product: watch),
+              ),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF1C1C1E),
             foregroundColor: Colors.white,
