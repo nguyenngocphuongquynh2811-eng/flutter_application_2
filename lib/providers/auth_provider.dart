@@ -2,15 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 import '../models/app_user.dart';
 
 class AuthProvider with ChangeNotifier {
-  // Seeded on first successful login attempt with these exact credentials,
-  // since Firebase's email/password provider has no concept of a plain
-  // "admin" username and there is no Admin SDK backend to pre-create it.
   static const _adminEmail = 'duongtrieuphu2311@gmail.com';
   static const _adminPassword = '123456';
+
+  /// Số ngày không đăng nhập tối đa trước khi bị auto-khóa (3 tháng).
+  static const _inactiveLockDays = 90;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -51,6 +52,7 @@ class AuthProvider with ChangeNotifier {
         'name': name.trim(),
         'email': email.trim().toLowerCase(),
         'role': 'user',
+        'lastLogin': FieldValue.serverTimestamp(),
       });
       await user.sendEmailVerification();
       await _loadUser(user);
@@ -62,30 +64,59 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<String?> login({required String email, required String password}) async {
+  Future<String?> login(
+      {required String email, required String password}) async {
     final normalizedEmail = email.trim().toLowerCase();
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: normalizedEmail,
         password: password,
       );
-      // Self-healing: whoever successfully signs in with the designated admin
-      // email is granted the admin role, even if that account already existed
-      // as a regular user from earlier testing.
+      final uid = credential.user!.uid;
+
       if (normalizedEmail == _adminEmail) {
-        await _firestore.collection('users').doc(credential.user!.uid).set(
+        // Admin gốc: tự cấp quyền, bỏ qua mọi luật khóa.
+        await _firestore.collection('users').doc(uid).set(
           {'role': 'admin'},
           SetOptions(merge: true),
         );
+      } else {
+        final data =
+            (await _firestore.collection('users').doc(uid).get()).data() ?? {};
+
+        // 1) Khóa thủ công có thời hạn (nếu dùng).
+        final locked = data['lockedUntil'];
+        if (locked is Timestamp && locked.toDate().isAfter(DateTime.now())) {
+          await _auth.signOut();
+          return 'Tài khoản đang bị khóa đến '
+              '${DateFormat('dd/MM/yyyy HH:mm').format(locked.toDate())}.';
+        }
+
+        // 2) Khóa do không đăng nhập quá 3 tháng.
+        final last = data['lastLogin'];
+        if (last is Timestamp &&
+            DateTime.now().difference(last.toDate()).inDays >
+                _inactiveLockDays) {
+          await _auth.signOut();
+          return 'Tài khoản bị khóa do không đăng nhập quá 3 tháng. '
+              'Vui lòng liên hệ admin để mở khóa.';
+        }
       }
+
+      // Qua hết -> cập nhật mốc đăng nhập gần nhất.
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .set({'lastLogin': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+
       await _loadUser(credential.user!);
       return null;
     } on FirebaseAuthException catch (e) {
-      // Newer Firebase projects have email-enumeration protection enabled,
-      // which reports 'invalid-credential' instead of 'user-not-found' even
-      // when the account simply doesn't exist yet — so the admin account
-      // must be bootstrapped on any of these codes, not just 'user-not-found'.
-      const missingAccountCodes = {'user-not-found', 'invalid-credential', 'wrong-password'};
+      const missingAccountCodes = {
+        'user-not-found',
+        'invalid-credential',
+        'wrong-password'
+      };
       if (missingAccountCodes.contains(e.code) &&
           normalizedEmail == _adminEmail &&
           password == _adminPassword) {
@@ -109,6 +140,7 @@ class AuthProvider with ChangeNotifier {
         'name': 'Admin',
         'email': _adminEmail,
         'role': 'admin',
+        'lastLogin': FieldValue.serverTimestamp(),
       });
       await _loadUser(user);
       return null;
@@ -132,19 +164,7 @@ class AuthProvider with ChangeNotifier {
       return 'Không thể gửi email đặt lại mật khẩu: $e';
     }
   }
-Future<String?> changeOwnPassword(String newPassword) async {
-  final user = _auth.currentUser;
-  if (user == null) return 'Chưa đăng nhập.';
-  try {
-    await user.updatePassword(newPassword);
-    return null;
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'requires-recent-login') {
-      return 'Vui lòng đăng xuất và đăng nhập lại trước khi đổi mật khẩu.';
-    }
-    return _mapAuthError(e);
-  }
-}
+
   Future<void> logout() async {
     await _auth.signOut();
     _currentUser = null;
@@ -155,7 +175,6 @@ Future<String?> changeOwnPassword(String newPassword) async {
   Future<String?> deleteAccount() async {
     final user = _auth.currentUser;
     if (user == null) return null;
-
     try {
       await _firestore.collection('users').doc(user.uid).delete();
       await user.delete();
@@ -171,17 +190,10 @@ Future<String?> changeOwnPassword(String newPassword) async {
     }
   }
 
-  /// Live list of every account (both roles) for the admin account-management screen.
   Stream<QuerySnapshot<Map<String, dynamic>>> watchAllUsers() {
     return _firestore.collection('users').orderBy('name').snapshots();
   }
 
-  /// Creates a brand-new login (user or admin) from inside the admin panel.
-  ///
-  /// Uses a secondary, throwaway [FirebaseApp] instance so that signing the
-  /// new account in (an unavoidable side effect of the client-only
-  /// `createUserWithEmailAndPassword` call) does not sign the admin who is
-  /// performing this action out of their own session.
   Future<String?> createAccountAsAdmin({
     required String name,
     required String email,
@@ -210,6 +222,7 @@ Future<String?> changeOwnPassword(String newPassword) async {
         'name': name.trim(),
         'email': email.trim().toLowerCase(),
         'role': role,
+        'lastLogin': FieldValue.serverTimestamp(),
       });
       await secondaryAuth.signOut();
       return null;
@@ -220,9 +233,6 @@ Future<String?> changeOwnPassword(String newPassword) async {
     }
   }
 
-  /// Edits the display name / role of any account. Email and password belong
-  /// to Firebase Auth and can only be changed by that account itself, so they
-  /// are intentionally not editable from here.
   Future<String?> updateUserProfile(
     String uid, {
     required String name,
@@ -231,27 +241,51 @@ Future<String?> changeOwnPassword(String newPassword) async {
   }) async {
     try {
       final data = <String, dynamic>{'name': name.trim(), 'role': role};
-    if (avatarBase64 != null) data['avatarBase64'] = avatarBase64;
-    await _firestore.collection('users').doc(uid).update(data);
-    if (uid == _auth.currentUser?.uid) {
-      await _loadUser(_auth.currentUser!);
+      if (avatarBase64 != null) data['avatarBase64'] = avatarBase64;
+      await _firestore.collection('users').doc(uid).update(data);
+      if (uid == _auth.currentUser?.uid) {
+        await _loadUser(_auth.currentUser!);
+      }
+      return null;
+    } catch (e) {
+      return 'Không thể cập nhật tài khoản: $e';
     }
-    return null;
-  } catch (e) {
-    return 'Không thể cập nhật tài khoản: $e';
   }
-}
-  /// Removes an account's profile/role data from Firestore. This does NOT
-  /// delete the underlying Firebase Authentication login — the client SDK
-  /// can only ever delete the *currently signed-in* user, never another
-  /// account, so fully revoking someone else's login requires a backend
-  /// (Cloud Functions + Admin SDK), which this project doesn't have.
+
   Future<String?> deleteUserProfile(String uid) async {
     try {
       await _firestore.collection('users').doc(uid).delete();
       return null;
     } catch (e) {
       return 'Không thể xóa tài khoản: $e';
+    }
+  }
+
+  /// Mở khóa: xóa khóa thủ công + reset mốc không hoạt động (kích hoạt lại).
+  Future<String?> unlockUser(String uid) async {
+    try {
+      await _firestore.collection('users').doc(uid).update({
+        'lockedUntil': FieldValue.delete(),
+        'lastLogin': FieldValue.serverTimestamp(),
+      });
+      return null;
+    } catch (e) {
+      return 'Không thể mở khóa: $e';
+    }
+  }
+
+  /// Đổi mật khẩu của CHÍNH tài khoản đang đăng nhập.
+  Future<String?> changeOwnPassword(String newPassword) async {
+    final user = _auth.currentUser;
+    if (user == null) return 'Chưa đăng nhập.';
+    try {
+      await user.updatePassword(newPassword);
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        return 'Vui lòng đăng xuất và đăng nhập lại trước khi đổi mật khẩu.';
+      }
+      return _mapAuthError(e);
     }
   }
 

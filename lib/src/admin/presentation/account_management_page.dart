@@ -17,6 +17,21 @@ ImageProvider? _avatarProvider(String? base64Image) {
   }
 }
 
+/// Số ngày tối đa không đăng nhập trước khi bị auto-khóa (3 tháng).
+const int _inactiveLockDays = 90;
+
+String _lastLoginText(DateTime? last) {
+  if (last == null) return 'Chưa đăng nhập';
+  final diff = DateTime.now().difference(last);
+  if (diff.inSeconds < 5) return 'Vừa đăng nhập';
+  if (diff.inSeconds < 60) return 'Đăng nhập ${diff.inSeconds} giây trước';
+  if (diff.inMinutes < 60) return 'Đăng nhập ${diff.inMinutes} phút trước';
+  if (diff.inHours < 24) return 'Đăng nhập ${diff.inHours} giờ trước';
+  if (diff.inDays < 30) return 'Đăng nhập ${diff.inDays} ngày trước';
+  if (diff.inDays < 365) return 'Đăng nhập ${diff.inDays ~/ 30} tháng trước';
+  return 'Đăng nhập ${diff.inDays ~/ 365} năm trước';
+}
+
 class AccountManagementPage extends StatelessWidget {
   const AccountManagementPage({super.key});
 
@@ -70,11 +85,22 @@ class AccountManagementPage extends StatelessWidget {
               final isManager = role == 'manager';
               final isSelf = doc.id == currentUid;
 
+              // Auto-khóa nếu không đăng nhập quá 3 tháng.
+              final lastTs = data['lastLogin'];
+              final lastLogin = lastTs is Timestamp ? lastTs.toDate() : null;
+              final isLocked = lastLogin != null &&
+                  DateTime.now().difference(lastLogin).inDays >
+                      _inactiveLockDays;
+
               return Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1C1C1E),
                   borderRadius: BorderRadius.circular(16),
+                  border: isLocked
+                      ? Border.all(
+                          color: Colors.orangeAccent.withValues(alpha: 0.4))
+                      : null,
                 ),
                 child: Row(
                   children: [
@@ -125,29 +151,61 @@ class AccountManagementPage extends StatelessWidget {
                                   color: Colors.white54, fontSize: 13),
                               overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: isAdmin
-                                  ? Colors.blueAccent.withValues(alpha: 0.15)
-                                  : isManager
-                                      ? Colors.orangeAccent.withValues(alpha: 0.15)
-                                      : Colors.white.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              isAdmin ? 'Admin' : (isManager ? 'Manager' : 'User'),
-                              style: TextStyle(
-                                color: isAdmin
-                                    ? Colors.blueAccent
-                                    : isManager
-                                        ? Colors.orangeAccent
-                                        : Colors.white70,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: isAdmin
+                                      ? Colors.blueAccent.withValues(alpha: 0.15)
+                                      : isManager
+                                          ? Colors.orangeAccent.withValues(alpha: 0.15)
+                                          : Colors.white.withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  isAdmin ? 'Admin' : (isManager ? 'Manager' : 'User'),
+                                  style: TextStyle(
+                                    color: isAdmin
+                                        ? Colors.blueAccent
+                                        : isManager
+                                            ? Colors.orangeAccent
+                                            : Colors.white70,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (isLocked) ...[
+                                      const Icon(Icons.lock,
+                                          color: Colors.orangeAccent,
+                                          size: 12),
+                                      const SizedBox(width: 3),
+                                    ],
+                                    Flexible(
+                                      child: Text(
+                                        _lastLoginText(lastLogin),
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            color: isLocked
+                                                ? Colors.orangeAccent
+                                                : Colors.white38,
+                                            fontSize: 11,
+                                            fontWeight: isLocked
+                                                ? FontWeight.w600
+                                                : FontWeight.normal),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -155,13 +213,23 @@ class AccountManagementPage extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.edit_outlined,
                           color: Colors.white54, size: 20),
+                      tooltip: 'Sửa',
                       onPressed: () =>
                           _openAccountForm(context, existing: doc),
                     ),
+                    if (isLocked)
+                      IconButton(
+                        icon: const Icon(Icons.lock_open,
+                            color: Colors.greenAccent, size: 20),
+                        tooltip: 'Mở khóa',
+                        onPressed: () => _unlock(context, doc.id),
+                      ),
                     IconButton(
                       icon: Icon(Icons.delete_outline,
-                          color: isSelf ? Colors.white24 : Colors.redAccent,
+                          color:
+                              isSelf ? Colors.white24 : Colors.redAccent,
                           size: 20),
+                      tooltip: 'Xóa tài khoản',
                       onPressed: isSelf
                           ? null
                           : () => _confirmDelete(context, doc.id, name, email),
@@ -176,6 +244,15 @@ class AccountManagementPage extends StatelessWidget {
     );
   }
 
+  Future<void> _unlock(BuildContext context, String uid) async {
+    final err = await context.read<AuthProvider>().unlockUser(uid);
+    if (err != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(err), backgroundColor: Colors.redAccent),
+      );
+    }
+  }
+
   Future<void> _confirmDelete(
       BuildContext context, String uid, String name, String email) async {
     final confirmed = await showDialog<bool>(
@@ -186,7 +263,7 @@ class AccountManagementPage extends StatelessWidget {
             style: TextStyle(color: Colors.white)),
         content: Text(
           'Xóa hồ sơ của "${name.isEmpty ? email : name}" khỏi hệ thống.\n\n'
-          'Lưu ý: thao tác này chỉ xóa hồ sơ/quyền trong ứng dụng. Vì lý do bảo mật, ứng dụng di động không thể tự xóa hẳn đăng nhập của người khác.',
+          'Lưu ý: chỉ xóa hồ sơ/quyền trong ứng dụng. Ứng dụng di động không thể tự xóa hẳn đăng nhập của người khác.',
           style: const TextStyle(color: Colors.white70),
         ),
         actions: [
@@ -245,7 +322,8 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
   bool get _isEditing => widget.existing != null;
 
   bool get _isSelf =>
-      _isEditing && widget.existing!.id == FirebaseAuth.instance.currentUser?.uid;
+      _isEditing &&
+      widget.existing!.id == FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void initState() {
@@ -322,7 +400,6 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
         role: _role,
         avatarBase64: _avatarBase64,
       );
-      // Đổi mật khẩu chỉ áp dụng cho chính mình.
       if (error == null &&
           _isSelf &&
           _passwordController.text.trim().isNotEmpty) {
@@ -375,8 +452,6 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
-
-                // Ảnh đại diện (chỉ khi sửa)
                 if (_isEditing)
                   Center(
                     child: Column(
@@ -394,13 +469,11 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
                           ),
                         ),
                         TextButton(
-                          onPressed: _pickAvatar,
-                          child: const Text('Đổi ảnh'),
-                        ),
+                            onPressed: _pickAvatar,
+                            child: const Text('Đổi ảnh')),
                       ],
                     ),
                   ),
-
                 AuthTextField(
                   controller: _nameController,
                   hint: 'Họ và tên',
@@ -410,7 +483,6 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
                       : null,
                 ),
                 const SizedBox(height: 14),
-
                 if (_isEditing)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 14),
@@ -448,8 +520,6 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
-                // Mật khẩu khi SỬA
                 if (_isEditing && _isSelf) ...[
                   AuthTextField(
                     controller: _passwordController,
@@ -457,7 +527,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
                     icon: Icons.lock_outline,
                     obscureText: true,
                     validator: (v) {
-                      if (v == null || v.isEmpty) return null; // không đổi
+                      if (v == null || v.isEmpty) return null;
                       if (v.length < 6) return 'Mật khẩu tối thiểu 6 ký tự';
                       return null;
                     },
@@ -475,8 +545,8 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
                       children: [
                         const Text(
                           'Không thể đặt mật khẩu cho người khác trực tiếp. Bạn có thể gửi email để họ tự đặt lại.',
-                          style: TextStyle(
-                              color: Colors.white54, fontSize: 13),
+                          style:
+                              TextStyle(color: Colors.white54, fontSize: 13),
                         ),
                         const SizedBox(height: 8),
                         TextButton.icon(
@@ -489,7 +559,6 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
                   ),
                   const SizedBox(height: 14),
                 ],
-
                 Row(
                   children: [
                     Expanded(
