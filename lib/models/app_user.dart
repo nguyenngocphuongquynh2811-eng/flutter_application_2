@@ -12,4 +12,5 @@ class AppUser {
   });
 
   bool get isAdmin => role == 'admin';
+  bool get isManager => role == 'manager';
 }

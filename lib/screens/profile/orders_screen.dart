@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
+import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/order.dart';
 import '../../providers/auth_provider.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -60,13 +64,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   ],
 
                   const Text(
-                    "Đơn Hàng Cũ",
+                    "Đơn Hàng Của Bạn",
                     style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 16),
 
-                  _orderCard(),
+                  _ordersList(),
 
                   const SizedBox(height: 40),
 
@@ -224,7 +228,74 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  Widget _orderCard() {
+  Widget _ordersList() {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      return const Text(
+        'Bạn cần đăng nhập để xem đơn hàng.',
+        style: TextStyle(color: Colors.white70, fontSize: 15),
+      );
+    }
+
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('orders')
+          .where('userId', isEqualTo: uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 30),
+            child: Center(child: CircularProgressIndicator(color: Colors.white)),
+          );
+        }
+        if (snapshot.hasError) {
+          return Text(
+            'Không thể tải đơn hàng: ${snapshot.error}',
+            style: const TextStyle(color: Colors.redAccent, fontSize: 14),
+          );
+        }
+
+        final orders = (snapshot.data?.docs ?? const [])
+            .map(Order.fromFirestore)
+            .toList()
+          ..sort((a, b) {
+            if (a.createdAt == null || b.createdAt == null) return 0;
+            return b.createdAt!.compareTo(a.createdAt!);
+          });
+
+        if (orders.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2C2C2E),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: const Text(
+              'Bạn chưa có đơn hàng nào.',
+              style: TextStyle(color: Colors.white70, fontSize: 15),
+            ),
+          );
+        }
+
+        return Column(
+          children: orders
+              .map((order) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _orderCard(order),
+                  ))
+              .toList(),
+        );
+      },
+    );
+  }
+
+  Widget _orderCard(Order order) {
+    final firstItem = order.items.isNotEmpty ? order.items.first : null;
+    final createdAt = order.createdAt;
+    final dateText =
+        createdAt != null ? '${createdAt.day} tháng ${createdAt.month}, ${createdAt.year}' : '';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -237,7 +308,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.asset(
-              "assets/images/ipad_pro.jpg",
+              firstItem != null && firstItem.imagePath.isNotEmpty
+                  ? firstItem.imagePath
+                  : "assets/images/ipad_pro.jpg",
               width: 90,
               height: 90,
               fit: BoxFit.cover,
@@ -248,14 +321,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "29 tháng 9, 2025",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
+                if (dateText.isNotEmpty)
+                  Text(
+                    dateText,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                 const SizedBox(height: 6),
-                const Text(
-                  "iPad Air 11 inch Wi-Fi 128GB - Xám Không Gian + 1 more item",
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, height: 1.3),
+                Text(
+                  order.itemsSummary,
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, height: 1.3),
                 ),
                 const SizedBox(height: 12),
                 Text.rich(
@@ -263,26 +337,46 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     style: const TextStyle(color: Colors.white70, fontSize: 14),
                     children: [
                       const TextSpan(text: "Đơn hàng #: ", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                      const TextSpan(text: "W1387068924"),
+                      TextSpan(text: order.id.substring(0, order.id.length.clamp(0, 8)).toUpperCase()),
                     ],
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text.rich(
-                  TextSpan(
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
-                    children: [
-                      const TextSpan(text: "Trạng thái: ", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                      const TextSpan(text: "Đã giao"),
-                    ],
-                  ),
+                Row(
+                  children: [
+                    const Text(
+                      "Trạng thái: ",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
+                    ),
+                    Text(
+                      order.status,
+                      style: TextStyle(color: _statusColor(order.status), fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${NumberFormat("#,###", "vi_VN").format(order.totalAmount)} ₫',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: Colors.white38),
         ],
       ),
     );
+  }
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'Đã giao':
+        return Colors.blueAccent;
+      case 'Đang giao':
+        return Colors.orangeAccent;
+      case 'Đã huỷ':
+        return Colors.redAccent;
+      default:
+        return Colors.white70;
+    }
   }
 }

@@ -6,8 +6,10 @@ import '../../data/mock_data.dart';
 import '../../models/product.dart';
 import '../../models/shop_card.dart';
 import '../../providers/cart_provider.dart';
+import 'accessory_list_screen.dart';
 import 'apple_music_detail_screen.dart';
 import 'apple_fitness_detail_screen.dart';
+import 'category_detail_screen.dart';
 import 'iphone_screen.dart';
 import 'apple_watch_screen.dart';
 
@@ -106,7 +108,7 @@ class ShopScreen extends StatelessWidget {
             ),
 
             SliverToBoxAdapter(
-              child: _accessories(),
+              child: _accessories(context),
             ),
 
             _sectionTitle("Khám phá sản phẩm mới"),
@@ -302,6 +304,16 @@ class ShopScreen extends StatelessWidget {
                     builder: (context) => const AppleWatchScreen(),
                   ),
                 );
+              } else {
+                final category = MockData.categories.firstWhere(
+                  (c) => c.name == items[index].$2,
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CategoryDetailScreen(category: category),
+                  ),
+                );
               }
             },
             child: Container(
@@ -337,11 +349,11 @@ class ShopScreen extends StatelessWidget {
     );
   }
 
-  static Widget _accessories() {
+  static Widget _accessories(BuildContext context) {
     final accessories = [
-      "Tất Cả Phụ Kiện",
-      "MagSafe",
-      "Dây Đeo Watch",
+      ("Tất Cả Phụ Kiện", ["accessory-magsafe", "accessory-watchband", "accessory-mac"]),
+      ("MagSafe", ["accessory-magsafe"]),
+      ("Dây Đeo Watch", ["accessory-watchband"]),
     ];
 
     return SizedBox(
@@ -351,21 +363,35 @@ class ShopScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 22),
         itemCount: accessories.length,
         itemBuilder: (_, index) {
-          return Container(
-            margin: const EdgeInsets.only(right: 12),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 25,
-            ),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1C1C1E),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Center(
-              child: Text(
-                accessories[index],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+          final (label, categoryIds) = accessories[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AccessoryListScreen(
+                    title: label,
+                    categoryIds: categoryIds,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 25,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1C1C1E),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Center(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),

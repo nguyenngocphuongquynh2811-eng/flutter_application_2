@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../screens/profile/account_bottom_sheet.dart';
 import '../../../widgets/profile_avatar.dart';
 import '../../../data/mock_data.dart';
+import '../../../models/category.dart';
 import '../../../screens/shop/apple_music_detail_screen.dart';
 import '../../../screens/shop/apple_fitness_detail_screen.dart';
 import '../../../data/cart_data.dart';
@@ -246,6 +247,9 @@ class AdminShopScreen extends StatelessWidget {
       ("ipad.jpg", "iPad", "c3"),
       ("mac.jpg", "Mac", "c1"),
       ("airpods.jpg", "AirPods", "c5"),
+      ("iphone.jpg", "MagSafe", "accessory-magsafe"),
+      ("watch.jpg", "Dây Đeo Watch", "accessory-watchband"),
+      ("keyboard.jpg", "Phụ Kiện Mac", "accessory-mac"),
     ];
 
     return SizedBox(
@@ -274,8 +278,15 @@ class AdminShopScreen extends StatelessWidget {
                 );
               }
               else {
-                final cat = MockData.categories
-                    .firstWhere((e) => e.id == items[index].$3);
+                final categoryId = items[index].$3;
+                final cat = categoryId.startsWith('accessory-')
+                    ? Category(
+                        id: categoryId,
+                        name: items[index].$2,
+                        imagePath: "assets/images/${items[index].$1}",
+                      )
+                    : MockData.categories
+                        .firstWhere((e) => e.id == categoryId);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -515,29 +526,33 @@ class AdminShopScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 18),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      product.price,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    if (product.priceNote != null)
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
                                       Text(
-                                        product.priceNote!,
+                                        product.price,
                                         style: const TextStyle(
-                                          color: Colors.white60,
-                                          fontSize: 13,
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                                  ],
+                                      if (product.priceNote != null)
+                                        Text(
+                                          product.priceNote!,
+                                          style: const TextStyle(
+                                            color: Colors.white60,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
+                                const SizedBox(width: 12),
                                 ElevatedButton(
                                   onPressed: () {},
                                   style: ElevatedButton.styleFrom(

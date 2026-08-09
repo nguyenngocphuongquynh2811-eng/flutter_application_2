@@ -1,30 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/category.dart';
+
 import '../../data/product_store.dart';
 import '../../widgets/product_card.dart';
 
-class CategoryDetailScreen extends StatelessWidget {
-  final Category category;
+class AccessoryListScreen extends StatelessWidget {
+  final String title;
+  final List<String> categoryIds;
 
-  const CategoryDetailScreen({super.key, required this.category});
+  const AccessoryListScreen({
+    super.key,
+    required this.title,
+    required this.categoryIds,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Filter products for this specific category
-    final categoryProducts = context.watch<ProductStore>().byCategory(category.id);
+    final products = context
+        .watch<ProductStore>()
+        .products
+        .where((p) => categoryIds.contains(p.categoryId))
+        .toList();
 
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(
-          category.name,
+          title,
           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: categoryProducts.isEmpty
+      body: products.isEmpty
           ? const Center(
               child: Text(
                 'Chưa có sản phẩm nào.',
@@ -35,20 +43,18 @@ class CategoryDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.6, // Adjusted for taller ProductCard style
+                childAspectRatio: 0.6,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
               ),
-              itemCount: categoryProducts.length,
+              itemCount: products.length,
               itemBuilder: (context, index) {
-                // To reuse the ProductCard widget without breaking its width constraint inside a GridView,
-                // we'll wrap it or just use it directly since it expands inside GridView.
                 return Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFF1C1C1E),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: ProductCard(product: categoryProducts[index]),
+                  child: ProductCard(product: products[index]),
                 );
               },
             ),

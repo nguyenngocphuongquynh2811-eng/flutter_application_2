@@ -116,6 +116,59 @@ class MockData {
     ),
   ];
 
+  static const List<Product> accessoryProducts = [
+    Product(
+      id: 'acc-magsafe-1',
+      name: 'Ốp Lưng Silicon MagSafe - Kem Vani',
+      description: 'Ốp lưng silicon mềm mại, gắn chuẩn khớp với MagSafe.',
+      price: 1403000,
+      imagePaths: ['assets/images/iphone.jpg'],
+      categoryId: 'accessory-magsafe',
+      tag: 'MagSafe',
+    ),
+    Product(
+      id: 'acc-magsafe-2',
+      name: 'Sạc MagSafe',
+      description: 'Sạc không dây gắn nam châm, tối ưu cho iPhone.',
+      price: 1290000,
+      imagePaths: ['assets/images/iphone.jpg'],
+      categoryId: 'accessory-magsafe',
+      tag: 'MagSafe',
+    ),
+    Product(
+      id: 'acc-watchband-1',
+      name: 'Dây Đeo Thể Thao - Cam Clementine',
+      description: 'Dây đeo thể thao mềm mại, thoáng khí cho Apple Watch.',
+      price: 1499000,
+      imagePaths: ['assets/images/watch.jpg'],
+      categoryId: 'accessory-watchband',
+    ),
+    Product(
+      id: 'acc-watchband-2',
+      name: 'Dây Quấn Milan - Gold',
+      description: 'Dây quấn kim loại sang trọng cho Apple Watch.',
+      price: 2999000,
+      imagePaths: ['assets/images/watch_cat.jpg'],
+      categoryId: 'accessory-watchband',
+    ),
+    Product(
+      id: 'acc-mac-1',
+      name: 'Magic Keyboard',
+      description: 'Bàn phím không dây, gõ êm và chính xác.',
+      price: 2599000,
+      imagePaths: ['assets/images/keyboard.jpg'],
+      categoryId: 'accessory-mac',
+    ),
+    Product(
+      id: 'acc-mac-2',
+      name: 'Magic Mouse',
+      description: 'Chuột không dây với mặt cảm ứng đa điểm.',
+      price: 2099000,
+      imagePaths: ['assets/images/mouse.jpg'],
+      categoryId: 'accessory-mac',
+    ),
+  ];
+
    static const List<PromoCard> promoCards = [
     PromoCard(
       image: 'assets/images/apple_music.jpg',

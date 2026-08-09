@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'data/banner_store.dart';
 import 'data/product_store.dart';
+import 'data/promotion_store.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
@@ -12,6 +13,7 @@ import 'screens/auth/email_verification_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/root_screen.dart';
 import 'src/admin/presentation/admin_shell.dart';
+import 'src/admin/presentation/manager_shell.dart';
 import 'src/core/theme/admin_theme.dart';
 
 void main() async {
@@ -26,6 +28,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
         ChangeNotifierProvider(create: (_) => ProductStore()),
         ChangeNotifierProvider(create: (_) => BannerStore()),
+        ChangeNotifierProvider(create: (_) => PromotionStore()),
       ],
       child: const AppleStoreApp(),
     ),
@@ -85,9 +88,14 @@ class _AuthGate extends StatelessWidget {
       );
     }
     if (!auth.isLoggedIn) return const LoginScreen();
-    if (!auth.isAdmin && !auth.isEmailVerified) return const EmailVerificationScreen();
+    if (!auth.isAdmin && !auth.isManager && !auth.isEmailVerified) {
+      return const EmailVerificationScreen();
+    }
     if (auth.isAdmin) {
       return Theme(data: buildAdminTheme(), child: const AdminShell());
+    }
+    if (auth.isManager) {
+      return Theme(data: buildAdminTheme(), child: const ManagerShell());
     }
     return const RootScreen();
   }

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -11,9 +13,51 @@ class _NotificationScreenState extends State<NotificationScreen> {
   bool orderStatus = false;
   bool sessionNotification = false;
   bool promotionNotification = false;
+  bool _isLoading = true;
+
+  DocumentReference<Map<String, dynamic>>? get _userDoc {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+    return FirebaseFirestore.instance.collection('users').doc(uid);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final doc = await _userDoc?.get();
+    final settings = doc?.data()?['settings'] as Map<String, dynamic>?;
+    if (settings != null && mounted) {
+      setState(() {
+        orderStatus = settings['orderStatusNotif'] as bool? ?? orderStatus;
+        sessionNotification = settings['sessionNotif'] as bool? ?? sessionNotification;
+        promotionNotification = settings['promotionNotif'] as bool? ?? promotionNotification;
+      });
+    }
+    if (mounted) setState(() => _isLoading = false);
+  }
+
+  Future<void> _saveSettings() async {
+    await _userDoc?.set({
+      'settings': {
+        'orderStatusNotif': orderStatus,
+        'sessionNotif': sessionNotification,
+        'promotionNotif': promotionNotification,
+      },
+    }, SetOptions(merge: true));
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -74,6 +118,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   setState(() {
                     orderStatus = v;
                   });
+                  _saveSettings();
                 },
               ),
 
@@ -88,6 +133,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   setState(() {
                     sessionNotification = v;
                   });
+                  _saveSettings();
                 },
               ),
 
@@ -102,6 +148,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   setState(() {
                     promotionNotification = v;
                   });
+                  _saveSettings();
                 },
               ),
 

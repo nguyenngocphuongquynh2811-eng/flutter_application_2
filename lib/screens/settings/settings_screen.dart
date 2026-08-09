@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'country_screen.dart';
 import 'notification_screen.dart';
@@ -14,9 +16,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool serviceEnabled = false;
   bool analyticsEnabled = true;
   String selectedCountry = 'Việt Nam';
+  bool _isLoading = true;
+
+  String? get _uid => FirebaseAuth.instance.currentUser?.uid;
+
+  DocumentReference<Map<String, dynamic>>? get _userDoc {
+    final uid = _uid;
+    if (uid == null) return null;
+    return FirebaseFirestore.instance.collection('users').doc(uid);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final doc = await _userDoc?.get();
+    final settings = doc?.data()?['settings'] as Map<String, dynamic>?;
+    if (settings != null && mounted) {
+      setState(() {
+        deviceEnabled = settings['deviceEnabled'] as bool? ?? deviceEnabled;
+        serviceEnabled = settings['serviceEnabled'] as bool? ?? serviceEnabled;
+        analyticsEnabled = settings['analyticsEnabled'] as bool? ?? analyticsEnabled;
+        selectedCountry = settings['country'] as String? ?? selectedCountry;
+      });
+    }
+    if (mounted) setState(() => _isLoading = false);
+  }
+
+  Future<void> _saveSettings() async {
+    await _userDoc?.set({
+      'settings': {
+        'deviceEnabled': deviceEnabled,
+        'serviceEnabled': serviceEnabled,
+        'analyticsEnabled': analyticsEnabled,
+        'country': selectedCountry,
+      },
+    }, SetOptions(merge: true));
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -157,6 +205,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() {
                           deviceEnabled = v;
                         });
+                        _saveSettings();
                       },
                     ),
 
@@ -178,6 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         setState(() {
                           serviceEnabled = v;
                         });
+                        _saveSettings();
                       },
                     ),
                   ],
@@ -218,6 +268,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     setState(() {
                       analyticsEnabled = v;
                     });
+                    _saveSettings();
                   },
                 ),
               ),
@@ -255,6 +306,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           setState(() {
                             selectedCountry = result;
                           });
+                          _saveSettings();
                         }
                       },
                       child: Row(

@@ -22,6 +22,7 @@ class AuthProvider with ChangeNotifier {
   AppUser? get currentUser => _currentUser;
   bool get isLoggedIn => _currentUser != null;
   bool get isAdmin => _currentUser?.isAdmin ?? false;
+  bool get isManager => _currentUser?.isManager ?? false;
   bool get isEmailVerified => _isEmailVerified;
   bool get isInitialized => _isInitialized;
 

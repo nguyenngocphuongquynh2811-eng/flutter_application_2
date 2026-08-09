@@ -55,6 +55,7 @@ class AccountManagementPage extends StatelessWidget {
               final email = (data['email'] as String?) ?? '';
               final role = (data['role'] as String?) ?? 'user';
               final isAdmin = role == 'admin';
+              final isManager = role == 'manager';
               final isSelf = doc.id == currentUid;
 
               return Container(
@@ -66,7 +67,11 @@ class AccountManagementPage extends StatelessWidget {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: isAdmin ? Colors.blueAccent : const Color(0xFF2C2C2E),
+                      backgroundColor: isAdmin
+                          ? Colors.blueAccent
+                          : isManager
+                              ? Colors.orangeAccent
+                              : const Color(0xFF2C2C2E),
                       child: Text(
                         name.isNotEmpty ? name[0].toUpperCase() : '?',
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -108,13 +113,19 @@ class AccountManagementPage extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isAdmin
                                   ? Colors.blueAccent.withValues(alpha: 0.15)
-                                  : Colors.white.withValues(alpha: 0.08),
+                                  : isManager
+                                      ? Colors.orangeAccent.withValues(alpha: 0.15)
+                                      : Colors.white.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              isAdmin ? 'Admin' : 'User',
+                              isAdmin ? 'Admin' : (isManager ? 'Manager' : 'User'),
                               style: TextStyle(
-                                color: isAdmin ? Colors.blueAccent : Colors.white70,
+                                color: isAdmin
+                                    ? Colors.blueAccent
+                                    : isManager
+                                        ? Colors.orangeAccent
+                                        : Colors.white70,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -326,6 +337,14 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
                         label: 'User',
                         selected: _role == 'user',
                         onTap: () => setState(() => _role = 'user'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _RoleChip(
+                        label: 'Manager',
+                        selected: _role == 'manager',
+                        onTap: () => setState(() => _role = 'manager'),
                       ),
                     ),
                     const SizedBox(width: 10),

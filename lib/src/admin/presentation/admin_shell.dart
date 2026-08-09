@@ -5,6 +5,9 @@ import 'package:flutter_application_2/src/product/screen/admin_shop_screen.dart'
 import '../../../providers/auth_provider.dart';
 import '../../core/theme/admin_theme.dart';
 import 'account_management_page.dart';
+import 'order_management_page.dart';
+import 'promotion_management_page.dart';
+import 'statistics_page.dart';
 
 class NavItem {
   const NavItem({
@@ -41,13 +44,13 @@ class _AdminShellState extends State<AdminShell> {
       label: 'Đơn hàng',
       icon: Icons.receipt_long_outlined,
       activeIcon: Icons.receipt_long,
-      screen: _Placeholder('Quản lý đơn hàng'),
+      screen: OrderManagementPage(),
     ),
     NavItem(
       label: 'Khuyến mãi',
       icon: Icons.local_offer_outlined,
       activeIcon: Icons.local_offer,
-      screen: _Placeholder('Quản lý khuyến mãi'),
+      screen: PromotionManagementPage(),
     ),
     NavItem(
       label: 'Tài khoản',
@@ -59,7 +62,7 @@ class _AdminShellState extends State<AdminShell> {
       label: 'Thống kê',
       icon: Icons.bar_chart_outlined,
       activeIcon: Icons.bar_chart,
-      screen: _Placeholder('Thống kê'),
+      screen: StatisticsPage(),
     ),
     NavItem(
       label: 'Cài đặt',

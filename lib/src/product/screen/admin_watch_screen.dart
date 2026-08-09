@@ -298,7 +298,7 @@ class AdminWatchScreen extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 560,
+      height: 600,
       child: ListView.builder(
         physics: const BouncingScrollPhysics(),
         scrollDirection: Axis.horizontal,
