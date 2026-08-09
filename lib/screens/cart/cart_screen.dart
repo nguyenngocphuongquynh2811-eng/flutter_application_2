@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
 import 'checkout_screen.dart';
+import '../../widgets/product_image.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -36,7 +37,7 @@ class CartScreen extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
+                        child: ProductImage(
                           cartItem.product.imagePaths[0],
                           width: 100,
                           height: 100,

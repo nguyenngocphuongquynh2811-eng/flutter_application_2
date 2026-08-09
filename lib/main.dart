@@ -2,9 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
 import 'data/banner_store.dart';
 import 'data/product_store.dart';
 import 'data/promotion_store.dart';
+import 'data/shop_card_store.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
@@ -15,6 +17,8 @@ import 'screens/root_screen.dart';
 import 'src/admin/presentation/admin_shell.dart';
 import 'src/admin/presentation/manager_shell.dart';
 import 'src/core/theme/admin_theme.dart';
+import 'data/experience_card_store.dart';
+import 'data/category_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +33,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProductStore()),
         ChangeNotifierProvider(create: (_) => BannerStore()),
         ChangeNotifierProvider(create: (_) => PromotionStore()),
+        ChangeNotifierProvider(create: (_) => ShopCardStore()),
+        ChangeNotifierProvider(create: (_) => ExperienceCardStore()),
+        ChangeNotifierProvider(create: (_) => CategoryStore()),
       ],
       child: const AppleStoreApp(),
     ),

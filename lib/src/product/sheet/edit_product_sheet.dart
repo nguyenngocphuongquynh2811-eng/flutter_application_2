@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 
-import '../../../../../data/mock_data.dart';
-import '../../../../../data/product_store.dart';
-import '../../../../../models/product.dart';
+import '../../../widgets/product_image.dart';
+import '../../../data/mock_data.dart';
+import '../../../data/product_store.dart';
+import '../../../models/product.dart';
 
 class EditProductSheet extends StatefulWidget {
   final Product product;
@@ -62,6 +65,80 @@ class _EditProductSheetState extends State<EditProductSheet> {
     super.dispose();
   }
 
+  void _pickSampleImage() {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return GridView.builder(
+          padding: const EdgeInsets.all(20),
+          itemCount: allImages.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemBuilder: (_, index) {
+            final path = allImages[index];
+
+            return GestureDetector(
+              onTap: () {
+                if (!editedImages.contains(path)) {
+                  setState(() {
+                    editedImages.add(path);
+                  });
+                }
+
+                Navigator.pop(context);
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  path,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _pickFromDevice() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Chọn từ thư viện'),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Chụp ảnh mới'),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      imageQuality: 50,
+      maxWidth: 1000,
+    );
+    if (picked == null) return;
+
+    final bytes = await picked.readAsBytes();
+    final base64Image = base64Encode(bytes);
+    setState(() => editedImages.add(base64Image));
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -100,48 +177,21 @@ class _EditProductSheetState extends State<EditProductSheet> {
 
               Align(
                 alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (_) {
-                        return GridView.builder(
-                          padding: const EdgeInsets.all(20),
-                          itemCount: allImages.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
-                          itemBuilder: (_, index) {
-                            final path = allImages[index];
-
-                            return GestureDetector(
-                              onTap: () {
-                                if (!editedImages.contains(path)) {
-                                  setState(() {
-                                    editedImages.add(path);
-                                  });
-                                }
-
-                                Navigator.pop(context);
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
-                                  path,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text("Thêm ảnh"),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _pickSampleImage,
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: const Text("Chọn ảnh có sẵn"),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      onPressed: _pickFromDevice,
+                      icon: const Icon(Icons.camera_alt_outlined),
+                      label: const Text("Tải ảnh từ máy"),
+                    ),
+                  ],
                 ),
               ),
 
@@ -176,7 +226,7 @@ class _EditProductSheetState extends State<EditProductSheet> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(6),
-                            child: Image.asset(
+                            child: ProductImage(
                               path,
                               width: 90,
                               height: 90,
@@ -261,7 +311,7 @@ class _EditProductSheetState extends State<EditProductSheet> {
               const SizedBox(height: 5),
 
               Text(
-                "${NumberFormat("#,###", "vi_VN").format(double.parse(priceController.text))} ₫",
+                "${NumberFormat("#,###", "vi_VN").format(double.tryParse(priceController.text) ?? widget.product.price)} ₫",
                 style: const TextStyle(
                   color: Colors.grey,
                 ),
@@ -282,7 +332,7 @@ class _EditProductSheetState extends State<EditProductSheet> {
                             final p = widget.allProducts[index];
 
                             return ListTile(
-                              leading: Image.asset(
+                              leading: ProductImage(
                                 p.imagePaths.first,
                                 width: 45,
                                 height: 45,

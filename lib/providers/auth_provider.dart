@@ -132,7 +132,19 @@ class AuthProvider with ChangeNotifier {
       return 'Không thể gửi email đặt lại mật khẩu: $e';
     }
   }
-
+Future<String?> changeOwnPassword(String newPassword) async {
+  final user = _auth.currentUser;
+  if (user == null) return 'Chưa đăng nhập.';
+  try {
+    await user.updatePassword(newPassword);
+    return null;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'requires-recent-login') {
+      return 'Vui lòng đăng xuất và đăng nhập lại trước khi đổi mật khẩu.';
+    }
+    return _mapAuthError(e);
+  }
+}
   Future<void> logout() async {
     await _auth.signOut();
     _currentUser = null;
@@ -215,21 +227,20 @@ class AuthProvider with ChangeNotifier {
     String uid, {
     required String name,
     required String role,
+    String? avatarBase64,
   }) async {
     try {
-      await _firestore.collection('users').doc(uid).update({
-        'name': name.trim(),
-        'role': role,
-      });
-      if (uid == _auth.currentUser?.uid) {
-        await _loadUser(_auth.currentUser!);
-      }
-      return null;
-    } catch (e) {
-      return 'Không thể cập nhật tài khoản: $e';
+      final data = <String, dynamic>{'name': name.trim(), 'role': role};
+    if (avatarBase64 != null) data['avatarBase64'] = avatarBase64;
+    await _firestore.collection('users').doc(uid).update(data);
+    if (uid == _auth.currentUser?.uid) {
+      await _loadUser(_auth.currentUser!);
     }
+    return null;
+  } catch (e) {
+    return 'Không thể cập nhật tài khoản: $e';
   }
-
+}
   /// Removes an account's profile/role data from Firestore. This does NOT
   /// delete the underlying Firebase Authentication login — the client SDK
   /// can only ever delete the *currently signed-in* user, never another

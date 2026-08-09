@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../models/category.dart';
 import '../../../models/product.dart';
 import '../../../data/product_store.dart';
+import '../../../widgets/product_image.dart';
 import '../admin_product_view_page.dart';
 import '../sheet/add_product_sheet.dart';
 
@@ -100,7 +101,7 @@ class AdminCategoryScreen extends StatelessWidget {
           children: [
             Expanded(
               flex: 3,
-              child: Image.asset(product.imagePaths.first,
+              child: ProductImage(product.imagePaths.first,
                   fit: BoxFit.cover, width: double.infinity),
             ),
             Expanded(

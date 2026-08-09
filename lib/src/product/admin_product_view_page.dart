@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../data/product_store.dart';
-import '../../../../models/product.dart';
+import '../../data/product_store.dart';
+import '../../models/product.dart';
+import '../../widgets/product_image.dart';
 import 'sheet/edit_product_sheet.dart';
 
 class AdminProductViewPage extends StatelessWidget {
@@ -32,7 +33,7 @@ class AdminProductViewPage extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
                 tag: "product-${product.id}",
-                child: Image.asset(
+                child: ProductImage(
                   product.imagePaths.first,
                   fit: BoxFit.cover,
                 ),
@@ -113,7 +114,7 @@ class AdminProductViewPage extends StatelessWidget {
                               borderRadius:
                                   BorderRadius
                                       .circular(16),
-                              child: Image.asset(
+                              child: ProductImage(
                                 product.imagePaths[
                                     index],
                                 fit: BoxFit.cover,
